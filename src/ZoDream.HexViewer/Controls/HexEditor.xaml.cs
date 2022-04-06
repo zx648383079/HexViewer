@@ -12,7 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ZoDream.HexViewer.Models;
 using ZoDream.HexViewer.Storage;
+using ZoDream.HexViewer.Utils;
 
 namespace ZoDream.HexViewer.Controls
 {
@@ -28,15 +30,15 @@ namespace ZoDream.HexViewer.Controls
 
 
 
-        public BaseMode LineMode
+        public ByteBaseMode LineMode
         {
-            get { return (BaseMode)GetValue(LineModeProperty); }
+            get { return (ByteBaseMode)GetValue(LineModeProperty); }
             set { SetValue(LineModeProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for LineMode.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty LineModeProperty =
-            DependencyProperty.Register("LineMode", typeof(BaseMode), typeof(HexEditor), new PropertyMetadata(BaseMode.Hex, (d, e) =>
+            DependencyProperty.Register("LineMode", typeof(ByteBaseMode), typeof(HexEditor), new PropertyMetadata(ByteBaseMode.Hex, (d, e) =>
             {
                 (d as HexEditor)?.UpdateLineMode();
             }));
@@ -55,15 +57,15 @@ namespace ZoDream.HexViewer.Controls
             }));
 
 
-        public BaseMode ByteMode
+        public ByteBaseMode ByteMode
         {
-            get { return (BaseMode)GetValue(ByteModeProperty); }
+            get { return (ByteBaseMode)GetValue(ByteModeProperty); }
             set { SetValue(ByteModeProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for ByteMode.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ByteModeProperty =
-            DependencyProperty.Register("ByteMode", typeof(BaseMode), typeof(HexEditor), new PropertyMetadata(BaseMode.Hex, (d, e) =>
+            DependencyProperty.Register("ByteMode", typeof(ByteBaseMode), typeof(HexEditor), new PropertyMetadata(ByteBaseMode.Hex, (d, e) =>
             {
                 (d as HexEditor)?.UpdateByteMode();
             }));
@@ -92,23 +94,37 @@ namespace ZoDream.HexViewer.Controls
         public static readonly DependencyProperty SourceProperty =
             DependencyProperty.Register("Source", typeof(IByteStream), typeof(HexEditor), new PropertyMetadata(null, (d, e) =>
             {
+                if (LocalizedLangExtension.IsDesignMode)
+                {
+                    return;
+                }
                 (d as HexEditor)?.UpdateSource();
             }));
 
+
+
+        public long Position
+        {
+            get { return (long)GetValue(PositionProperty); }
+            set { SetValue(PositionProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Position.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty PositionProperty =
+            DependencyProperty.Register("Position", typeof(long), typeof(HexEditor), new PropertyMetadata(0L, (d, e) =>
+            {
+                (d as HexEditor)?.GotoPosition((long)e.NewValue);
+            }));
+
+
+
         private byte[]? OriginalBuffer;
-        private long StartPosition = 0;
 
         private double ByteWidth
         {
             get
             {
-                return ByteMode switch
-                {
-                    BaseMode.Octal => 4 * 10,
-                    BaseMode.Decimal => 3 * 10,
-                    BaseMode.Hex => 2 * 10,
-                    _ => (double)(8 * 10),
-                };
+                return App.ViewModel.Get(ByteMode).Length * FontSize * .7;
             }
         }
 
@@ -148,46 +164,22 @@ namespace ZoDream.HexViewer.Controls
             }
         }
 
-        private int FormatBaseMode(BaseMode mode)
-        {
-            return mode switch
-            {
-                BaseMode.Binary => 2,
-                BaseMode.Octal => 8,
-                BaseMode.Decimal => 10,
-                BaseMode.Hex => 16,
-                _ => 10,
-            };
-        }
 
-        private int PadBaseMode(BaseMode mode)
+        public void Refresh(bool sizeChanged = false)
         {
-            return mode switch
+            if (sizeChanged)
             {
-                BaseMode.Binary => 8,
-                BaseMode.Octal => 4,
-                BaseMode.Decimal => 3,
-                BaseMode.Hex => 2,
-                _ => 3,
-            };
-        }
-
-        private string PrefixBaseMode(BaseMode mode)
-        {
-            return mode switch
-            {
-                BaseMode.Binary => "0b",
-                BaseMode.Octal => "0",
-                BaseMode.Decimal => string.Empty,
-                BaseMode.Hex => "0x",
-                _ => string.Empty,
-            };
+                var pageCount = PageCount;
+                ByteScrollBar.Maximum = LineCount;
+                ByteScrollBar.Value = 0;
+                ByteScrollBar.Visibility = pageCount > 1 ? Visibility.Visible : Visibility.Collapsed;
+            }
+            GotoPosition(Position);
         }
 
         private void UpdateBytes(IList<byte> items, int lineCount)
         {
-            var byteFormat = FormatBaseMode(ByteMode);
-            var pad = PadBaseMode(ByteMode);
+            var format = App.ViewModel.Get(ByteMode);
             ForEachChildren(BytePanel, lineCount, (panel, i) =>
             {
                 panel.Height = ByteHeight;
@@ -195,7 +187,8 @@ namespace ZoDream.HexViewer.Controls
                 ForEachChildren(panel, Math.Min(items.Count - start, ByteLength), (tb, j) =>
                 {
                     tb.Width = ByteWidth;
-                    tb.Content = Convert.ToString(items[start + j], byteFormat).PadLeft(pad, '0');
+                    tb.FontSize = FontSize;
+                    tb.Content = format.Format(items[start + j], false, true);
                 }, i =>
                 {
                     return new ByteLabel()
@@ -214,12 +207,12 @@ namespace ZoDream.HexViewer.Controls
 
         private void UpdateLine(long start, int lineCount)
         {
-            var lineFormat = FormatBaseMode(LineMode);
-            var linePrefix = PrefixBaseMode(LineMode);
+            var format = App.ViewModel.Get(LineMode);
             ForEachChildren(LinePanel, lineCount, (tb, i) =>
             {
                 tb.Height = ByteHeight;
-                tb.Content = linePrefix + Convert.ToString(start + (i * ByteLength), lineFormat);
+                tb.FontSize = FontSize;
+                tb.Content = format.Format(start + (i * ByteLength), true);
             }, i =>
             {
                 return new ByteLabel()
@@ -235,6 +228,7 @@ namespace ZoDream.HexViewer.Controls
             ForEachChildren(TextPanel, lineCount, (tb, i) =>
             {
                 tb.Height = ByteHeight;
+                tb.FontSize = FontSize;
                 var start = i * ByteLength;
                 var bytes = new byte[Math.Min(items.Count - start, ByteLength)];
                 for (int j = 0; j < bytes.Length; j++)
@@ -258,18 +252,12 @@ namespace ZoDream.HexViewer.Controls
 
         private void UpdateByteHeader()
         {
-            ByteModeTb.Text = ByteMode switch
-            {
-                BaseMode.Binary => "二进制",
-                BaseMode.Octal => "八进制",
-                BaseMode.Decimal => "十进制",
-                BaseMode.Hex => "十六进制",
-                _ => "?",
-            };
+            ByteModeTb.Text = App.ViewModel.Get(ByteMode).Name;
             var byteFormat = 16;
             ForEachChildren(ByteHeaderPanel, ByteLength, (tb, i) =>
             {
                 tb.Width = ByteWidth;
+                tb.FontSize = FontSize;
                 tb.Content = Convert.ToString(i, byteFormat);
             }, i =>
             {
@@ -340,7 +328,7 @@ namespace ZoDream.HexViewer.Controls
         {
             var lineCount = (int)Math.Ceiling((double)buffer.Length / ByteLength);
             OriginalBuffer = buffer;
-            StartPosition = position;
+            Position = position;
             UpdateLine(position, lineCount);
             UpdateBytes(buffer, lineCount);
             UpdateText(buffer, lineCount);
@@ -363,13 +351,13 @@ namespace ZoDream.HexViewer.Controls
             {
                 return;
             }
-            UpdateLine(StartPosition, (int)Math.Ceiling((double)OriginalBuffer.Length / ByteLength));
+            UpdateLine(Position, (int)Math.Ceiling((double)OriginalBuffer.Length / ByteLength));
         }
 
         private void UpdateByteLength()
         {
             UpdateByteHeader();
-            GotoPosition(StartPosition);
+            Refresh(true);
         }
 
         private void UpdateEncoding()
@@ -386,10 +374,10 @@ namespace ZoDream.HexViewer.Controls
         {
             ByteMode = ByteMode switch
             {
-                BaseMode.Binary => BaseMode.Octal,
-                BaseMode.Octal => BaseMode.Decimal,
-                BaseMode.Hex => BaseMode.Binary,
-                _ => BaseMode.Hex,
+                ByteBaseMode.Binary => ByteBaseMode.Octal,
+                ByteBaseMode.Octal => ByteBaseMode.Decimal,
+                ByteBaseMode.Hex => ByteBaseMode.Binary,
+                _ => ByteBaseMode.Hex,
             };
         }
 
@@ -409,7 +397,7 @@ namespace ZoDream.HexViewer.Controls
 
         private void ToggleLineMode()
         {
-            LineMode = LineMode == BaseMode.Decimal ? BaseMode.Hex : BaseMode.Decimal;
+            LineMode = LineMode == ByteBaseMode.Decimal ? ByteBaseMode.Hex : ByteBaseMode.Decimal;
         }
 
         private void ByteScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -462,16 +450,7 @@ namespace ZoDream.HexViewer.Controls
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            GotoPosition(StartPosition);
+            Refresh();
         }
-    }
-
-
-    public enum BaseMode
-    {
-        Binary,
-        Octal,
-        Decimal,
-        Hex
     }
 }

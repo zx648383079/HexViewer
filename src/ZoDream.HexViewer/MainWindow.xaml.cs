@@ -48,7 +48,7 @@ namespace ZoDream.HexViewer
             {
                 return;
             }
-            ViewModel.FileName = items.First();
+            OpenFile(items.First());
         }
 
         private void OpenBtn_Click(object sender, RoutedEventArgs e)
@@ -58,25 +58,45 @@ namespace ZoDream.HexViewer
             {
                 return;
             }
-            ViewModel.FileName = picker.FileName;
+            OpenFile(picker.FileName);
+        }
+
+        private void OpenFile(string file)
+        {
+            ViewModel.FileName = file;
+            if (string.IsNullOrWhiteSpace(file))
+            {
+                PreviewBtn.Visibility = SearchBtn.Visibility = SaveBtn.Visibility = DeleteBtn.Visibility = EditBtn.Visibility = Visibility.Collapsed;
+            } else
+            {
+                PreviewBtn.Visibility = SearchBtn.Visibility = SaveBtn.Visibility = DeleteBtn.Visibility = EditBtn.Visibility = Visibility.Visible;
+            }
+            
         }
 
         private void EditBtn_Click(object sender, RoutedEventArgs e)
         {
             var page = new EditView();
-            page.ShowDialog();
+            if (page.ShowDialog() == true)
+            {
+                HexTb.Refresh(true);
+            }
         }
 
         private void SearchBtn_Click(object sender, RoutedEventArgs e)
         {
-            var page = new SearchView();
+            var page = new SearchView(HexTb.Position);
+            page.OnFound += (sender, e) =>
+            {
+                HexTb.GotoPosition(e.NewValue);
+            };
             page.Show();
         }
 
         private void SettingBtn_Click(object sender, RoutedEventArgs e)
         {
             var page = new SettingView();
-            page.ShowDialog();
+            page.Show();
         }
 
         private void PreviewBtn_Click(object sender, RoutedEventArgs e)

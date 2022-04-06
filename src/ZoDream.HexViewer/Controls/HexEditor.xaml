@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ZoDream.HexViewer.Controls"
              mc:Ignorable="d"
+             x:Name="root"
              Loaded="UserControl_Loaded"
              SizeChanged="UserControl_SizeChanged"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -36,17 +37,17 @@
         </Grid.RowDefinitions>
         <GridSplitter Width="1"/>
         <GridSplitter Grid.Column="1" Width="1"/>
-        <TextBlock Text="起始位置"/>
+        <TextBlock Text="起始位置" FontSize="{Binding ElementName=root, Path=FontSize}"/>
         <Grid Grid.Column="1" Style="{StaticResource HeaderPanel}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock x:Name="ByteModeTb" Text="十六进制" MouseDown="ByteModeTb_MouseDown"/>
+            <TextBlock x:Name="ByteModeTb" Text="十六进制" MouseDown="ByteModeTb_MouseDown" FontSize="{Binding ElementName=root, Path=FontSize}"/>
             <StackPanel x:Name="ByteHeaderPanel" Orientation="Horizontal" Grid.Row="1"/>
         </Grid>
         <Grid Grid.Column="2"  Style="{StaticResource HeaderPanel}">
-            <TextBlock x:Name="TextHeaderTb" Text="文本(ACSII)" MouseDown="TextHeaderTb_MouseDown"/>
+            <TextBlock x:Name="TextHeaderTb" Text="文本(ACSII)" MouseDown="TextHeaderTb_MouseDown" FontSize="{Binding ElementName=root, Path=FontSize}"/>
         </Grid>
         <StackPanel x:Name="LinePanel" Grid.Row="1" MouseWheel="BytePanel_MouseWheel"/>
         <StackPanel x:Name="BytePanel" Grid.Row="1" Grid.Column="1" MouseWheel="BytePanel_MouseWheel"/>

@@ -3,10 +3,60 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ctl="clr-namespace:ZoDream.HexViewer.Controls"
         xmlns:local="clr-namespace:ZoDream.HexViewer.Pages"
         mc:Ignorable="d"
+        Loaded="Window_Loaded"
         Title="编辑" Height="450" Width="800" ShowInTaskbar="False" WindowStartupLocation="CenterScreen">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="100"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="编辑区间：" VerticalAlignment="Center"/>
+            <ctl:NumberInput x:Name="StartTb"/>
+            <TextBlock Text="-"  VerticalAlignment="Center"/>
+            <ctl:NumberInput x:Name="EndTb" Min="{Binding ElementName=StartTb,Path=Value}"/>
+            <TextBlock Text="内容格式：" VerticalAlignment="Center"/>
+            <ComboBox x:Name="TypeTb" SelectedIndex="0" SelectionChanged="TypeTb_SelectionChanged" VerticalContentAlignment="Center" Width="100"/>
+        </StackPanel>
+        <Button x:Name="SaveBtn" Content="写入" Click="SaveBtn_Click" Grid.Column="1"/>
+        <Grid x:Name="BytePanel" Grid.Row="1" Grid.ColumnSpan="2" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="子节进制："  VerticalAlignment="Center"/>
+                <ComboBox x:Name="ByteTypeTb" SelectedIndex="0" DisplayMemberPath="Name" VerticalContentAlignment="Center" Width="100"/>
+            </StackPanel>
+            <TextBox x:Name="ByteTextTb" Grid.Row="1" TextWrapping="Wrap"/>
+        </Grid>
+        <Grid x:Name="TextPanel" Grid.Row="1" Grid.ColumnSpan="2" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="编码："  VerticalAlignment="Center"/>
+                <ComboBox x:Name="EncodingTb" IsEditable="True" VerticalContentAlignment="Center" Width="100"/>
+            </StackPanel>
+            <TextBox x:Name="TextTb" Grid.Row="1" AcceptsReturn="True" AcceptsTab="True"/>
+        </Grid>
+        <Grid x:Name="FilePanel" Grid.Row="1" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="选择文件："  VerticalAlignment="Center"/>
+                <ctl:FileInput x:Name="FileTb" Width="200"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

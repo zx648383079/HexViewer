@@ -30,7 +30,7 @@ namespace ZoDream.HexViewer.Pages
             var encoding = Encoding.GetEncoding(EncodingTb.Text.Trim());
             var start = StartTb.Value;
             var end = EndTb.Value;
-            if (end <= start)
+            if (end < start)
             {
                 MessageBox.Show("区间错误");
                 return;
@@ -50,7 +50,7 @@ namespace ZoDream.HexViewer.Pages
                 TextTb.Text = string.Empty;
                 return;
             }
-            TextTb.Text = encoding.GetString(await App.ViewModel.Reader.ReadAsync(start, Convert.ToInt32(end - start)));
+            TextTb.Text = encoding.GetString(await App.ViewModel.Reader.ReadAsync(start, Convert.ToInt32(end - start + 1)));
         }
 
         private void ExportBtn_Click(object sender, RoutedEventArgs e)

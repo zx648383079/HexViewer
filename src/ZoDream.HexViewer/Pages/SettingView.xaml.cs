@@ -23,5 +23,11 @@ namespace ZoDream.HexViewer.Pages
         {
             InitializeComponent();
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            EncodingTb.ItemsSource = Encoding.GetEncodings().Select(i => i.Name).ToArray();
+            LineTb.ItemsSource = ByteTb.ItemsSource = App.ViewModel.ByteModeItems;
+        }
     }
 }

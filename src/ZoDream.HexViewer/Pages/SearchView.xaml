@@ -5,7 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ZoDream.HexViewer.Pages"
         mc:Ignorable="d"
+        Loaded="Window_Loaded"
         Title="搜索" Height="200" Width="600" ShowInTaskbar="False" WindowState="Normal" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Button">
+                <Setter Property="Height" Value="30"/>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -17,15 +25,22 @@
             <RowDefinition Height="165*"/>
         </Grid.RowDefinitions>
         <TextBlock Text="搜索内容：" VerticalAlignment="Center"/>
-        <StackPanel Grid.Column="1" Orientation="Horizontal">
+        <StackPanel x:Name="TextPanel" Grid.Column="1" Orientation="Horizontal">
             <TextBlock Text="编码："  VerticalAlignment="Center"/>
-            <ComboBox x:Name="EncodingTb" IsEditable="True"  Width="100"/>
+            <ComboBox x:Name="EncodingTb" IsEditable="True" Text="UTF8" Width="100" VerticalContentAlignment="Center"/>
         </StackPanel>
-        <TextBox AcceptsTab="True" AcceptsReturn="True" Grid.Row="1" Grid.ColumnSpan="2"/>
+        <StackPanel x:Name="BytePanel" Grid.Column="1" Orientation="Horizontal" Visibility="Collapsed">
+            <TextBlock Text="子节进制："  VerticalAlignment="Center"/>
+            <ComboBox x:Name="ByteTypeTb" SelectedIndex="0" DisplayMemberPath="Name"  Width="80" VerticalContentAlignment="Center"/>
+        </StackPanel>
+        <TextBox x:Name="TextTb" AcceptsTab="True" AcceptsReturn="True" 
+                 Grid.Row="1" Grid.ColumnSpan="2" />
         <StackPanel Grid.Column="2" Grid.RowSpan="2">
-            <Button Content="搜索"/>
-            <Button Content="上一项"/>
-            <Button Content="下一项"/>
+            <Button x:Name="SearchBtn" Content="搜索" Click="SearchBtn_Click"/>
+            <Button x:Name="PreviousBtn" Content="上一项" Click="PreviousBtn_Click"/>
+            <Button x:Name="NextBtn" Content="下一项" Click="NextBtn_Click"/>
+            <RadioButton x:Name="TextRadio" Content="文本" IsChecked="True" Checked="TextRadio_Checked" Margin="0 20 0 0"/>
+            <RadioButton x:Name="ByteRadio" Content="子节" Checked="ByteRadio_Checked"/>
         </StackPanel>
     </Grid>
 </Window>

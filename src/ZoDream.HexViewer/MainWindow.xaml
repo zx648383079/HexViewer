@@ -15,11 +15,11 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
             <ctl:IconButton x:Name="OpenBtn" Icon="&#xE1A5;" Label="打开文件" Click="OpenBtn_Click"/>
-            <ctl:IconButton x:Name="EditBtn" Icon="&#xE104;" Label="编辑" Click="EditBtn_Click"/>
-            <ctl:IconButton x:Name="DeleteBtn" Icon="&#xE107;" Label="删除"/>
-            <ctl:IconButton x:Name="SaveBtn" Icon="&#xE105;" Label="保存"/>
-            <ctl:IconButton x:Name="SearchBtn" Icon="&#xE11A;" Label="搜索" Click="SearchBtn_Click"/>
-            <ctl:IconButton x:Name="PreviewBtn" Icon="&#xE7B3;" Label="预览" Click="PreviewBtn_Click"/>
+            <ctl:IconButton x:Name="EditBtn" Icon="&#xE104;" Label="编辑" Visibility="Collapsed" Click="EditBtn_Click"/>
+            <ctl:IconButton x:Name="DeleteBtn" Icon="&#xE107;" Label="删除" Visibility="Collapsed"/>
+            <ctl:IconButton x:Name="SaveBtn" Icon="&#xE105;" Label="保存" Visibility="Collapsed"/>
+            <ctl:IconButton x:Name="SearchBtn" Icon="&#xE11A;" Label="搜索" Visibility="Collapsed" Click="SearchBtn_Click"/>
+            <ctl:IconButton x:Name="PreviewBtn" Icon="&#xE7B3;" Label="预览" Visibility="Collapsed" Click="PreviewBtn_Click"/>
             <ctl:IconButton x:Name="SettingBtn" Icon="&#xE115;" Label="配置" Click="SettingBtn_Click"/>
             <ctl:IconButton x:Name="HelpBtn" Icon="&#xE11B;" Label="帮助"/>
         </StackPanel>
