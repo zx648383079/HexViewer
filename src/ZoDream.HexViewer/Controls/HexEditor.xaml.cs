@@ -29,7 +29,6 @@ namespace ZoDream.HexViewer.Controls
         }
 
 
-
         public ByteBaseMode LineMode
         {
             get { return (ByteBaseMode)GetValue(LineModeProperty); }

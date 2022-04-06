@@ -6,8 +6,7 @@
         xmlns:ctl="clr-namespace:ZoDream.HexViewer.Controls"
         xmlns:local="clr-namespace:ZoDream.HexViewer.Pages"
         mc:Ignorable="d"
-        Loaded="Window_Loaded"
-        Title="设置" Height="450" Width="800" ShowInTaskbar="False" WindowStartupLocation="CenterScreen">
+        Title="设置" Height="450" Width="800" ShowInTaskbar="False" Topmost="True" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <ResourceDictionary>
             <Style x:Key="HeaderTb" TargetType="TextBlock">
@@ -40,15 +39,15 @@
                     <GroupBox Header="界面显示">
                         <StackPanel>
                             <TextBlock Text="字体大小" Style="{StaticResource HeaderTb}"/>
-                            <ctl:NumberInput x:Name="FontSizeTb" Value="16" Min="10" Max="100" HorizontalAlignment="Left"/>
+                            <ctl:NumberInput x:Name="FontSizeTb" Value="{Binding FontSize, Mode=TwoWay}" Min="10" Max="100" HorizontalAlignment="Left"/>
                             <TextBlock Text="一行字节数" Style="{StaticResource HeaderTb}"/>
-                            <ctl:NumberInput x:Name="ByteLengthTb" Value="16" Min="8" Max="50" HorizontalAlignment="Left"/>
+                            <ctl:NumberInput x:Name="ByteLengthTb" Value="{Binding ByteLength, Mode=TwoWay}" Min="8" Max="50" HorizontalAlignment="Left"/>
                             <TextBlock Text="位置格式" Style="{StaticResource HeaderTb}"/>
-                            <ComboBox x:Name="LineTb" SelectedIndex="3" DisplayMemberPath="Name"/>
+                            <ComboBox x:Name="LineTb" ItemsSource="{Binding ByteModeItems}" SelectedItem="{Binding LineMode, Mode=TwoWay}" DisplayMemberPath="Name"/>
                             <TextBlock Text="子节格式" Style="{StaticResource HeaderTb}"/>
-                            <ComboBox x:Name="ByteTb" SelectedIndex="3" DisplayMemberPath="Name"/>
+                            <ComboBox x:Name="ByteTb"  ItemsSource="{Binding ByteModeItems}" SelectedItem="{Binding ByteMode, Mode=TwoWay}" DisplayMemberPath="Name"/>
                             <TextBlock Text="文本编码" Style="{StaticResource HeaderTb}"/>
-                            <ComboBox x:Name="EncodingTb" IsEditable="True" Text="ACSII"/>
+                            <ComboBox x:Name="EncodingTb" IsEditable="True" ItemsSource="{Binding EncodingItems}" Text="{Binding TextEncoding, Mode=TwoWay}"/>
                         </StackPanel>
                     </GroupBox>
                 </ScrollViewer>

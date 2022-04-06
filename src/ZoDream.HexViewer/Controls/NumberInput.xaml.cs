@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -75,6 +76,8 @@ namespace ZoDream.HexViewer.Controls
 
         public event RoutedPropertyChangedEventHandler<long>? ValueChanged;
 
+        private CancellationTokenSource TokenSource = new();
+
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var tb = d as NumberInput;
@@ -109,19 +112,30 @@ namespace ZoDream.HexViewer.Controls
 
         private void ValueTb_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var oldVal = Value;
-            var val = Convert.ToInt64((sender as TextBox).Text);
-            if (val < Min)
+            TokenSource.Cancel();
+            TokenSource = new CancellationTokenSource();
+            Task.Factory.StartNew(() =>
             {
-                val = Min;
-            }
-            else if (Max > 0 && val > Max)
-            {
-                val = Max;
-            }
-            Value = val;
-            ValueTb.Text = val.ToString();
-            ValueChanged?.Invoke(this, new RoutedPropertyChangedEventArgs<long>(oldVal, Value));
+                Thread.Sleep(2000);
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    var oldVal = Value;
+                    var val = Convert.ToInt64((sender as TextBox).Text);
+                    if (val < Min)
+                    {
+                        val = Min;
+                    }
+                    else if (Max > 0 && val > Max)
+                    {
+                        val = Max;
+                    }
+                    Value = val;
+                    ValueTb.Text = val.ToString();
+                    ValueChanged?.Invoke(this, new RoutedPropertyChangedEventArgs<long>(oldVal, Value));
+                });
+            }, TokenSource.Token);
         }
+
+
     }
 }

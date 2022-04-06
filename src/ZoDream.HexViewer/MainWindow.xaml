@@ -6,7 +6,7 @@
         xmlns:ctl="clr-namespace:ZoDream.HexViewer.Controls"
         xmlns:local="clr-namespace:ZoDream.HexViewer"
         mc:Ignorable="d"
-        Title="Hex Viewer" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+        Title="Hex Viewer" Height="600" Width="800" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>

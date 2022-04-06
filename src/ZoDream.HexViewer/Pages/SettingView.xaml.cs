@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using ZoDream.HexViewer.ViewModels;
 
 namespace ZoDream.HexViewer.Pages
 {
@@ -19,15 +20,14 @@ namespace ZoDream.HexViewer.Pages
     /// </summary>
     public partial class SettingView : Window
     {
-        public SettingView()
+        public SettingView(SettingViewModel viewModel)
         {
             InitializeComponent();
+            ViewModel = viewModel;
+            DataContext = viewModel;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            EncodingTb.ItemsSource = Encoding.GetEncodings().Select(i => i.Name).ToArray();
-            LineTb.ItemsSource = ByteTb.ItemsSource = App.ViewModel.ByteModeItems;
-        }
+        public SettingViewModel ViewModel;
+
     }
 }

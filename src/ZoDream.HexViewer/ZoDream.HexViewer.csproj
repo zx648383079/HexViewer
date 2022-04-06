@@ -10,6 +10,7 @@
     <Authors>zodream</Authors>
     <Company>zodream.cn</Company>
     <Product>HexEditor</Product>
+	  <ApplicationIcon>hex.ico</ApplicationIcon>
     <Copyright>copyright © 2020-2022 zodream.cn</Copyright>
   </PropertyGroup>
 
