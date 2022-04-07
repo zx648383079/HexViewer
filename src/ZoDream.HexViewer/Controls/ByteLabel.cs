@@ -51,6 +51,9 @@ namespace ZoDream.HexViewer.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ByteLabel), new FrameworkPropertyMetadata(typeof(ByteLabel)));
         }
 
+        public byte OriginalByte { get; internal set; }
+        public long OriginalPosition { get; internal set; }
+
         public string Content
         {
             get { return (string)GetValue(ContentProperty); }
@@ -72,6 +75,19 @@ namespace ZoDream.HexViewer.Controls
         // Using a DependencyProperty as the backing store for TextAlignment.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TextAlignmentProperty =
             DependencyProperty.Register("TextAlignment", typeof(HorizontalAlignment), typeof(ByteLabel), new PropertyMetadata(HorizontalAlignment.Left));
+
+
+
+
+        public bool IsActive
+        {
+            get { return (bool)GetValue(IsActiveProperty); }
+            set { SetValue(IsActiveProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for IsActive.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IsActiveProperty =
+            DependencyProperty.Register("IsActive", typeof(bool), typeof(ByteLabel), new PropertyMetadata(false));
 
 
     }

@@ -94,5 +94,22 @@ namespace ZoDream.HexViewer.Pages
             await stream.WriteAsync(bytes, start, count);
             DialogResult = true;
         }
+
+        public void UpdateRange(long positon, int length, string text)
+        {
+            StartTb.Value = positon;
+            EndTb.Value = positon + length;
+            ByteTextTb.Text = text;
+            TextTb.Text = text;
+            for (int i = App.ViewModel.ByteModeItems.Length - 1; i >= 0; i--)
+            {
+                if (App.ViewModel.ByteModeItems[i].IsMatch(text))
+                {
+                    TypeTb.SelectedIndex = 1;
+                    ByteTypeTb.SelectedIndex = i;
+                    return;
+                }
+            }
+        }
     }
 }

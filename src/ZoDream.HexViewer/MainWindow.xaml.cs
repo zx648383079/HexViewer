@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ZoDream.HexViewer.Pages;
+using ZoDream.HexViewer.Storage;
 using ZoDream.HexViewer.ViewModels;
 
 namespace ZoDream.HexViewer
@@ -65,7 +66,7 @@ namespace ZoDream.HexViewer
         {
             ViewModel.FileName = file;
             PropertyBtn.Visibility = PreviewBtn.Visibility = SearchBtn.Visibility =
-                    SaveBtn.Visibility = DeleteBtn.Visibility = EditBtn.Visibility = string.IsNullOrWhiteSpace(file) ?
+                    SaveBtn.Visibility = EditBtn.Visibility = string.IsNullOrWhiteSpace(file) ?
                     Visibility.Collapsed : Visibility.Visible;
         }
 
@@ -136,6 +137,78 @@ namespace ZoDream.HexViewer
         {
             var page = new PropertyView();
             page.ShowDialog();
+        }
+
+        private void HexTb_SelectionChanged(object sender, RoutedPropertyChangedEventArgs<int> e)
+        {
+            ToolTipTb.Text = e.NewValue < 1 ? string.Empty : $"已选中 {e.NewValue} 个子节";
+            DeleteBtn.Visibility = e.NewValue < 1 ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void DeleteBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.Reader == null || !HexTb.IsSelectionActive)
+            {
+                return;
+            }
+            var select = HexTb.SelectionByte;
+            DeleteAsync(ViewModel.Reader, select.Item2, select.Item1.Length);
+        }
+
+        private void TapCopy()
+        {
+            if (ViewModel.Reader == null || !HexTb.IsSelectionActive)
+            {
+                return;
+            }
+            var select = HexTb.SelectionByte;
+            var format = ViewModel.Get(HexTb.ByteMode);
+            Clipboard.SetText(string.Join(" ", select.Item1.Select(i => format.Format(i, false, true))));
+            MessageBox.Show("复制成功");
+        }
+
+        private void TapPaste()
+        {
+            if (ViewModel.Reader == null || !HexTb.IsSelectionActive)
+            {
+                return;
+            }
+            var text = Clipboard.GetText();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+            var page = new EditView();
+            var select = HexTb.SelectionByte;
+            page.UpdateRange(select.Item2 < 0 ? HexTb.Position : select.Item2, select.Item1.Length, text);
+            if (page.ShowDialog() == true)
+            {
+                HexTb.Refresh(true);
+            }
+        }
+
+        private async void DeleteAsync(IByteStream stream, long position, int count)
+        {
+            await stream.DeleteAsync(position, count);
+            HexTb.Refresh(true);
+        }
+
+        private void CommandBinding_Copy(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (ViewModel.Reader == null || !HexTb.IsSelectionActive)
+            {
+                return;
+            }
+            TapCopy();
+        }
+
+        private void CommandBinding_Paste(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (ViewModel.Reader == null || !HexTb.IsSelectionActive)
+            {
+                return;
+            }
+            TapPaste();
         }
     }
 }

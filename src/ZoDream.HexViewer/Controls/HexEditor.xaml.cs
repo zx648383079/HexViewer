@@ -100,8 +100,6 @@ namespace ZoDream.HexViewer.Controls
                 (d as HexEditor)?.UpdateSource();
             }));
 
-
-
         public long Position
         {
             get { return (long)GetValue(PositionProperty); }
@@ -118,6 +116,32 @@ namespace ZoDream.HexViewer.Controls
 
 
         private byte[]? OriginalBuffer;
+        private Action<Point, bool>? OnMouseMoveEnd;
+        public event RoutedPropertyChangedEventHandler<int>? SelectionChanged;
+
+        public bool IsSelectionActive { get; private set; } = false;
+
+        public Tuple<byte[], long> SelectionByte
+        {
+            get
+            {
+                var items = new List<byte>();
+                var start = -1;
+                ForEachByte((item, j) =>
+                {
+                    if (!item.IsActive)
+                    {
+                        return;
+                    }
+                    if (start < 0)
+                    {
+                        start = j;
+                    }
+                    items.Add(item.OriginalByte);
+                });
+                return Tuple.Create(items.ToArray(), start < 0 ? -1L : (start + Position));
+            }
+        }
 
         private double ByteWidth
         {
@@ -187,7 +211,10 @@ namespace ZoDream.HexViewer.Controls
                 {
                     tb.Width = ByteWidth;
                     tb.FontSize = FontSize;
-                    tb.Content = format.Format(items[start + j], false, true);
+                    var itemIndex = start + j;
+                    tb.OriginalByte = items[itemIndex];
+                    tb.OriginalPosition = Position + itemIndex;
+                    tb.Content = format.Format(items[itemIndex], false, true);
                 }, i =>
                 {
                     return new ByteLabel()
@@ -300,6 +327,22 @@ namespace ZoDream.HexViewer.Controls
                 var item = addFn.Invoke(i);
                 panel.Children.Add(item);
                 updateFn.Invoke(item, i);
+            }
+        }
+
+        private void ForEachByte(Action<ByteLabel, int> func)
+        {
+            var i = 0;
+            foreach (StackPanel item in BytePanel.Children)
+            {
+                foreach (ByteLabel it in item.Children)
+                {
+                    if (it.Visibility == Visibility.Visible)
+                    {
+                        func.Invoke(it, i);
+                        i++;
+                    }
+                }
             }
         }
 
@@ -432,6 +475,50 @@ namespace ZoDream.HexViewer.Controls
             UpdateByteSource(await Source.ReadAsync(index, PageLineCount * ByteLength), index);
         }
 
+
+        public void Select(long position, int count, bool IsFinish = true)
+        {
+            var i = position - Position;
+            var end = i + count;
+            var len = 0;
+            ForEachByte((item, j) =>
+            {
+                var isActive = j >= i && j < end;
+                item.IsActive = isActive;
+                if (isActive)
+                {
+                    len++;
+                }
+            });
+            IsSelectionActive = len > 0;
+            if (IsFinish)
+            {
+                SelectionChanged?.Invoke(this, new RoutedPropertyChangedEventArgs<int>(0, len));
+            }
+        }
+
+        public void Select()
+        {
+            Select(0L, 0);
+        }
+
+        public void Select(Point begin, Point end, bool IsFinish = true)
+        {
+            var bY = Math.Floor(begin.Y / ByteHeight);
+            var eY = Math.Floor(end.Y / ByteHeight);
+            var bX = Math.Floor(begin.X / ByteWidth);
+            var eX = Math.Floor(end.X / ByteWidth);
+            if (bY < eY || (bY == eY && bX < eX))
+            {
+                var b = Position + bY * ByteLength + bX;
+                Select(Convert.ToInt64(b), Convert.ToInt32(Position + eY * ByteLength + eX + 1 - b), IsFinish);
+            } else
+            {
+                var e = Position + eY * ByteLength + eX;
+                Select(Convert.ToInt64(e), Convert.ToInt32(Position + bY * ByteLength + bX + 1 - e), IsFinish);
+            }
+        }
+
         private void BytePanel_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             ByteScrollBar_ValueChanged(ByteScrollBar, new RoutedPropertyChangedEventArgs<double>(ByteScrollBar.Value, ByteScrollBar.Value - (e.Delta / 120)));
@@ -450,6 +537,39 @@ namespace ZoDream.HexViewer.Controls
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             Refresh();
+        }
+
+        private void BytePanel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton != MouseButton.Left)
+            {
+                return;
+            }
+            var start = e.GetPosition(BytePanel);
+            OnMouseMoveEnd = (end, up) =>
+            {
+                Select(start, end, up);
+            };
+        }
+
+        private void BytePanel_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton != MouseButton.Left)
+            {
+                return;
+            }
+            var end = e.GetPosition(BytePanel);
+            OnMouseMoveEnd?.Invoke(end, true);
+        }
+
+        private void BytePanel_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed)
+            {
+                return;
+            }
+            var end = e.GetPosition(BytePanel);
+            OnMouseMoveEnd?.Invoke(end, false);
         }
     }
 }

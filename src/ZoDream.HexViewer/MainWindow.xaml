@@ -7,6 +7,18 @@
         xmlns:local="clr-namespace:ZoDream.HexViewer"
         mc:Ignorable="d"
         Title="Hex Viewer" Height="600" Width="800" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <RoutedUICommand x:Key="Copy" Text="复制" />
+        <RoutedUICommand x:Key="Paste" Text="粘贴" />
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Gesture="Ctrl+C" Command="{StaticResource Copy}" />
+        <KeyBinding Gesture="Ctrl+V" Command="{StaticResource Paste}" />
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource Copy}" Executed="CommandBinding_Copy"></CommandBinding>
+        <CommandBinding Command="{StaticResource Paste}" Executed="CommandBinding_Paste"></CommandBinding>
+    </Window.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -16,7 +28,7 @@
         <StackPanel Orientation="Horizontal">
             <ctl:IconButton x:Name="OpenBtn" Icon="&#xE1A5;" Label="打开文件" Click="OpenBtn_Click"/>
             <ctl:IconButton x:Name="EditBtn" Icon="&#xE104;" Label="编辑" Visibility="Collapsed" Click="EditBtn_Click"/>
-            <ctl:IconButton x:Name="DeleteBtn" Icon="&#xE107;" Label="删除" Visibility="Collapsed"/>
+            <ctl:IconButton x:Name="DeleteBtn" Icon="&#xE107;" Label="删除" Visibility="Collapsed" Click="DeleteBtn_Click"/>
             <ctl:IconButton x:Name="SaveBtn" Icon="&#xE105;" Label="保存" Visibility="Collapsed"/>
             <ctl:IconButton x:Name="SearchBtn" Icon="&#xE11A;" Label="搜索" Visibility="Collapsed" Click="SearchBtn_Click"/>
             <ctl:IconButton x:Name="PreviewBtn" Icon="&#xE7B3;" Label="预览" Visibility="Collapsed" Click="PreviewBtn_Click"/>
@@ -25,6 +37,15 @@
             <ctl:IconButton x:Name="HelpBtn" Icon="&#xE11B;" Label="帮助"/>
         </StackPanel>
         <ctl:HexEditor x:Name="HexTb" Source="{Binding Path=Reader}" Grid.Row="1" 
-                       PreviewDragOver="HexTb_PreviewDragOver" Drop="HexTb_Drop"/>
+                       PreviewDragOver="HexTb_PreviewDragOver" Drop="HexTb_Drop" 
+                       SelectionChanged="HexTb_SelectionChanged"/>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock/>
+            <TextBlock x:Name="ToolTipTb" Grid.Column="1"/>
+        </Grid>
     </Grid>
 </Window>

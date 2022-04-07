@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ZoDream.HexViewer.Models
@@ -83,6 +84,41 @@ namespace ZoDream.HexViewer.Models
                 buffer.Add(Convert.ToByte(item, StringFormat));
             }
             return buffer.ToArray();
+        }
+
+        public bool IsMatch(string text)
+        {
+            text = text.Trim();
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            if (Prefix.Length > 1 && Regex.IsMatch(text, "^" + Prefix + @"[0-9a-fA-F]{" + Length + @"}$"))
+            {
+                return true;
+            }
+            if (!Regex.IsMatch(text, @"^[0-9a-fA-F\s]+$"))
+            {
+                return false;
+            }
+            var items = text.Split(new char[] { ' ' }, 2);
+            if (items[0].Length == Length)
+            {
+                return true;
+            }
+            if (Regex.IsMatch(text, @"[a-fA-F]"))
+            {
+                return Mode == ByteBaseMode.Hex;
+            }
+            if (Regex.IsMatch(text, @"[89]"))
+            {
+                return Mode == ByteBaseMode.Decimal;
+            }
+            if (Regex.IsMatch(text, @"[2-7]"))
+            {
+                return Mode == ByteBaseMode.Octal;
+            }
+            return Mode == ByteBaseMode.Binary;
         }
 
         public ByteModeItem(ByteBaseMode mode, string name)

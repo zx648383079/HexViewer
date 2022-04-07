@@ -86,7 +86,7 @@ namespace ZoDream.HexViewer.Controls
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 var file = ((Array)e.Data.GetData(DataFormats.FileDrop))?.GetValue(0)?.ToString();
-                if (string.IsNullOrEmpty(file))
+                if (file == null || string.IsNullOrEmpty(file))
                 {
                     return;
                 }
@@ -131,7 +131,7 @@ namespace ZoDream.HexViewer.Controls
 
         private void FileTb_TextChanged(object sender, TextChangedEventArgs e)
         {
-            FileChanged?.Invoke(this, new RoutedPropertyChangedEventArgs<string>(FileName, (sender as TextBox).Text.Trim()));
+            FileChanged?.Invoke(this, new RoutedPropertyChangedEventArgs<string>(FileName, (sender as TextBox)!.Text.Trim()));
         }
     }
 }
