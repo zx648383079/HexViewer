@@ -190,6 +190,7 @@ namespace ZoDream.HexViewer
         private async void DeleteAsync(IByteStream stream, long position, int count)
         {
             await stream.DeleteAsync(position, count);
+            HexTb.Select();
             HexTb.Refresh(true);
         }
 
