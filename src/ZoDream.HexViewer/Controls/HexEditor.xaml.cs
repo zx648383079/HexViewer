@@ -363,7 +363,7 @@ namespace ZoDream.HexViewer.Controls
                 UpdateByteSource(Array.Empty<byte>());
                 return;
             }
-            GotoPage(0);
+            GotoPosition(0);
         }
 
         private void UpdateByteSource(byte[] buffer, long position = 0)

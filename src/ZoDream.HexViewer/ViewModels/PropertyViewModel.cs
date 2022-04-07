@@ -113,21 +113,32 @@ namespace ZoDream.HexViewer.ViewModels
                     continue;
                 }
                 var args = line.Split(new char[] { ',' }, 4);
-                if (args.Length != 4)
+                if (args.Length < 2)
                 {
                     continue;
                 }
-                var headerFormat = new FileHeaderItem(args[0].Trim(), args[1].Trim())
+                try
                 {
-                    FooterHex = args[2].Trim(),
-                    Description = args[3].Trim(),
-                };
-                if (await headerFormat.MatchAsync(stream))
+                    var headerFormat = new FileHeaderItem(args[0].Trim(), args[1].Trim())
+                    {
+                        FooterHex = args.Length > 2 ? args[2].Trim() : string.Empty,
+                        Description = args.Length > 3 ? args[3].Trim() : string.Empty,
+                    };
+                    if (await headerFormat.MatchAsync(stream))
+                    {
+                        App.Current.Dispatcher.Invoke(() =>
+                        {
+                            TypeItems.Add(headerFormat);
+                        });
+                    }
+                }
+                catch (Exception)
                 {
                     App.Current.Dispatcher.Invoke(() =>
                     {
-                        TypeItems.Add(headerFormat);
+                        TypeMessage = $"Signature hex error [{line}]";
                     });
+                    return;
                 }
             }
             App.Current.Dispatcher.Invoke(() =>

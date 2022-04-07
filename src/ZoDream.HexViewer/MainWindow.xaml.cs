@@ -68,6 +68,7 @@ namespace ZoDream.HexViewer
             PropertyBtn.Visibility = PreviewBtn.Visibility = SearchBtn.Visibility =
                     SaveBtn.Visibility = EditBtn.Visibility = string.IsNullOrWhiteSpace(file) ?
                     Visibility.Collapsed : Visibility.Visible;
+            HexTb.Source = ViewModel.Reader;
         }
 
         private void EditBtn_Click(object sender, RoutedEventArgs e)
