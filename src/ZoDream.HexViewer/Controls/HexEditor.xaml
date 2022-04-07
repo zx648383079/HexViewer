@@ -8,6 +8,7 @@
              x:Name="root"
              Loaded="UserControl_Loaded"
              SizeChanged="UserControl_SizeChanged"
+             Background="#55f4f4f4"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -27,7 +28,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="100"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
@@ -49,9 +50,9 @@
         <Grid Grid.Column="2"  Style="{StaticResource HeaderPanel}">
             <TextBlock x:Name="TextHeaderTb" Text="文本(ACSII)" MouseDown="TextHeaderTb_MouseDown" FontSize="{Binding ElementName=root, Path=FontSize}"/>
         </Grid>
-        <StackPanel x:Name="LinePanel" Grid.Row="1" MouseWheel="BytePanel_MouseWheel"/>
-        <StackPanel x:Name="BytePanel" Grid.Row="1" Grid.Column="1" MouseWheel="BytePanel_MouseWheel"/>
-        <StackPanel x:Name="TextPanel" Grid.Row="1" Grid.Column="2" MouseWheel="BytePanel_MouseWheel"/>
+        <StackPanel x:Name="LinePanel" Grid.Row="1" MouseWheel="BytePanel_MouseWheel" Background="#eee"/>
+        <StackPanel x:Name="BytePanel" Grid.Row="1" Grid.Column="1" MouseWheel="BytePanel_MouseWheel" Background="#66ffffff"/>
+        <StackPanel x:Name="TextPanel" Grid.Row="1" Grid.Column="2" MouseWheel="BytePanel_MouseWheel" Background="#99eeeeee"/>
         <ScrollBar x:Name="ByteScrollBar" Visibility="Collapsed" Minimum="1" Grid.Column="3" Grid.Row="1" ValueChanged="ByteScrollBar_ValueChanged"/>
     </Grid>
 </UserControl>

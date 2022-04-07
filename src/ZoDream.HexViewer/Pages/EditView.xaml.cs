@@ -29,7 +29,7 @@ namespace ZoDream.HexViewer.Pages
 
         private void TypeTb_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var i = (sender as ComboBox).SelectedIndex;
+            var i = (sender as ComboBox)!.SelectedIndex;
             BytePanel.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
             TextPanel.Visibility = i < 1 ? Visibility.Visible : Visibility.Collapsed;
             FilePanel.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
@@ -48,6 +48,7 @@ namespace ZoDream.HexViewer.Pages
             {
                 return;
             }
+            SaveBtn.IsEnabled = false;
             var start = StartTb.Value;
             var end = EndTb.Value;
             var count = end < start ? 0 : (end - start + 1);

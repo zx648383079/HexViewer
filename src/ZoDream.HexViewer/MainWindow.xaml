@@ -24,6 +24,7 @@
             <ctl:IconButton x:Name="SettingBtn" Icon="&#xE115;" Label="配置" Click="SettingBtn_Click"/>
             <ctl:IconButton x:Name="HelpBtn" Icon="&#xE11B;" Label="帮助"/>
         </StackPanel>
-        <ctl:HexEditor x:Name="HexTb" Source="{Binding Path=Reader}" Grid.Row="1" PreviewDragOver="HexTb_PreviewDragOver" Drop="HexTb_Drop"/>
+        <ctl:HexEditor x:Name="HexTb" Source="{Binding Path=Reader}" Grid.Row="1" 
+                       PreviewDragOver="HexTb_PreviewDragOver" Drop="HexTb_Drop"/>
     </Grid>
 </Window>

@@ -123,7 +123,7 @@ namespace ZoDream.HexViewer.Controls
         {
             get
             {
-                return App.ViewModel.Get(ByteMode).Length * FontSize * .7;
+                return App.ViewModel.Get(ByteMode).Length * FontSize * .7 + 10;
             }
         }
 

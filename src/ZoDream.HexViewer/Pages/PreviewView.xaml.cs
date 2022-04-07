@@ -67,13 +67,15 @@ namespace ZoDream.HexViewer.Pages
             {
                 return;
             }
+            ExportBtn.IsEnabled = false;
             SaveAsync(picker.FileName, start, end);
         }
 
         private async void SaveAsync(string fileName, long start, long end)
         {
             using var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write);
-            await App.ViewModel.Reader.CopyToAsync(fs, start, end - start);
+            await App.ViewModel.Reader!.CopyToAsync(fs, start, end - start);
+            ExportBtn.IsEnabled = true;
         }
     }
 }
