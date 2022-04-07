@@ -1,0 +1,68 @@
+﻿<Window x:Class="ZoDream.HexViewer.Pages.PropertyView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cvt="clr-namespace:ZoDream.HexViewer.Converters"
+        xmlns:local="clr-namespace:ZoDream.HexViewer.Pages"
+        mc:Ignorable="d"
+        Title="属性" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <cvt:SizeConverter x:Key="Size"/>
+            <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style x:Key="HeaderTb" TargetType="TextBlock">
+                <Setter Property="Padding" Value="0 8"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="200"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="文件名：" Style="{StaticResource HeaderTb}"/>
+            <TextBlock Text="{Binding Name}" Grid.Column="1"/>
+
+            <TextBlock Text="文件路径：" Grid.Row="1" Style="{StaticResource HeaderTb}"/>
+            <TextBlock Text="{Binding FileName}" Grid.Row="1" Grid.Column="1"/>
+            
+            <TextBlock Text="文件大小：" Grid.Row="2" Style="{StaticResource HeaderTb}"/>
+            <TextBlock Text="{Binding Length,Converter={StaticResource Size}}" Grid.Row="2" Grid.Column="1"/>
+
+            <TextBlock Text="创建时间：" Grid.Row="3" Style="{StaticResource HeaderTb}"/>
+            <TextBlock Text="{Binding CreatedAt}" Grid.Row="3" Grid.Column="1"/>
+
+            <TextBlock Text="修改时间：" Grid.Row="4" Style="{StaticResource HeaderTb}"/>
+            <TextBlock Text="{Binding UpdatedAt}" Grid.Row="4" Grid.Column="1"/>
+
+            <TextBlock Text="文件类型：" Grid.Row="5" Style="{StaticResource HeaderTb}"/>
+            <TextBlock Text="{Binding TypeMessage, Mode=OneWay}" Grid.Row="5" Grid.Column="1"/>
+            <ListView ItemsSource="{Binding TypeItems}" Grid.Row="6" Grid.ColumnSpan="2">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="拓展名" DisplayMemberBinding="{Binding Extension}" Width="100"/>
+                        <GridViewColumn Header="说明" DisplayMemberBinding="{Binding Description}" Width="300"/>
+                        <GridViewColumn Header="文件头" DisplayMemberBinding="{Binding HeaderHex}"/>
+                        <GridViewColumn Header="文件尾" DisplayMemberBinding="{Binding FooterHex}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+    </ScrollViewer>
+</Window>

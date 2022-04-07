@@ -36,6 +36,44 @@ namespace ZoDream.HexViewer.Models
         {
             var buffer = new List<byte>();
             var items = text.Split(new char[] { ' ', '\n', '\r', '\t' });
+            if (Prefix.Length > 1 && text.Contains(Prefix))
+            {
+                // 根据前缀来拆
+                var temp = new List<string>();
+                foreach (var item in items)
+                {
+                    if (string.IsNullOrEmpty(item))
+                    {
+                        continue;
+                    }
+                    foreach (var it in item.Split(new string[] { Prefix }, StringSplitOptions.None))
+                    {
+                        if (string.IsNullOrEmpty(it))
+                        {
+                            continue;
+                        }
+                        temp.Add(it);
+                    }
+                }
+                items = temp.ToArray();
+            } else if (!text.Contains(' '))
+            {
+                // 根据长度来拆
+                var temp = new List<string>();
+                foreach (var item in items)
+                {
+                    if (string.IsNullOrEmpty(item))
+                    {
+                        continue;
+                    }
+                    for (int i = 0; i < item.Length; i+= Length)
+                    {
+                        var j = Math.Min(i + Length, Length);
+                        temp.Add(item.Substring(i, j - i));
+                    }
+                }
+                items = temp.ToArray();
+            }
             foreach (var item in items)
             {
                 if (string.IsNullOrEmpty(item))

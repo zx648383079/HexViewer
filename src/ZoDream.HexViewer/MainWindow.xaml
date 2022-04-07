@@ -20,6 +20,7 @@
             <ctl:IconButton x:Name="SaveBtn" Icon="&#xE105;" Label="保存" Visibility="Collapsed"/>
             <ctl:IconButton x:Name="SearchBtn" Icon="&#xE11A;" Label="搜索" Visibility="Collapsed" Click="SearchBtn_Click"/>
             <ctl:IconButton x:Name="PreviewBtn" Icon="&#xE7B3;" Label="预览" Visibility="Collapsed" Click="PreviewBtn_Click"/>
+            <ctl:IconButton x:Name="PropertyBtn" Icon="&#xE946;" Label="属性" Visibility="Collapsed" Click="PropertyBtn_Click"/>
             <ctl:IconButton x:Name="SettingBtn" Icon="&#xE115;" Label="配置" Click="SettingBtn_Click"/>
             <ctl:IconButton x:Name="HelpBtn" Icon="&#xE11B;" Label="帮助"/>
         </StackPanel>

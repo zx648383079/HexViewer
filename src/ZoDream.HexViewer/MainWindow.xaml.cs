@@ -64,14 +64,9 @@ namespace ZoDream.HexViewer
         private void OpenFile(string file)
         {
             ViewModel.FileName = file;
-            if (string.IsNullOrWhiteSpace(file))
-            {
-                PreviewBtn.Visibility = SearchBtn.Visibility = SaveBtn.Visibility = DeleteBtn.Visibility = EditBtn.Visibility = Visibility.Collapsed;
-            } else
-            {
-                PreviewBtn.Visibility = SearchBtn.Visibility = SaveBtn.Visibility = DeleteBtn.Visibility = EditBtn.Visibility = Visibility.Visible;
-            }
-            
+            PropertyBtn.Visibility = PreviewBtn.Visibility = SearchBtn.Visibility =
+                    SaveBtn.Visibility = DeleteBtn.Visibility = EditBtn.Visibility = string.IsNullOrWhiteSpace(file) ?
+                    Visibility.Collapsed : Visibility.Visible;
         }
 
         private void EditBtn_Click(object sender, RoutedEventArgs e)
@@ -134,6 +129,12 @@ namespace ZoDream.HexViewer
         private void PreviewBtn_Click(object sender, RoutedEventArgs e)
         {
             var page = new PreviewView();
+            page.ShowDialog();
+        }
+
+        private void PropertyBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var page = new PropertyView();
             page.ShowDialog();
         }
     }

@@ -28,18 +28,16 @@ namespace ZoDream.HexViewer.Storage
 
         public Task<byte[]> ReadAsync(int count)
         {
-            return Task.Factory.StartNew(() =>
+            return Lock(() =>
             {
-                WaitUnlock();
                 return Read(count);
             });
         }
 
         public Task<byte[]> ReadAsync(long position, int count)
         {
-            return Task.Factory.StartNew(() =>
+            return Lock(() =>
             {
-                WaitUnlock();
                 Seek(position);
                 return Read(count);
             });
@@ -47,9 +45,8 @@ namespace ZoDream.HexViewer.Storage
 
         public Task SeekAsync(long position)
         {
-            return Task.Factory.StartNew(() =>
+            return Lock(() =>
             {
-                WaitUnlock();
                 Seek(position);
             });
         }
@@ -57,14 +54,12 @@ namespace ZoDream.HexViewer.Storage
 
         public Task<long> FindAsync(byte[] buffer, long position = 0, bool reverse = false)
         {
-            return Task.Factory.StartNew(() =>
+            return Lock(() =>
             {
                 if (reverse && position < buffer.Length)
                 {
                     return -1L;
                 }
-                WaitUnlock();
-                IsLoading = true;
                 if (position < 0)
                 {
                     position = 0;
@@ -89,8 +84,20 @@ namespace ZoDream.HexViewer.Storage
                         }
                     }
                 }
-                IsLoading = false;
                 return -1L;
+            });
+        }
+
+
+        public Task<bool> IsAsync(byte[] buffer, long position)
+        {
+            return Lock(() =>
+            {
+                if (position < 0)
+                {
+                    return false;
+                }
+                return IsByte(buffer, position);
             });
         }
 
@@ -107,14 +114,12 @@ namespace ZoDream.HexViewer.Storage
 
         public Task CopyToAsync(Stream dist, long position, long count)
         {
-            return Task.Factory.StartNew(() =>
+            return Lock(() =>
             {
                 if (count <= 0)
                 {
                     return;
                 }
-                WaitUnlock();
-                IsLoading = true;
                 Seek(position);
                 while (count > 0)
                 {
@@ -126,44 +131,35 @@ namespace ZoDream.HexViewer.Storage
                     dist.WriteByte((byte)bt);
                     count --;
                 }
-                IsLoading = false;
             });
         }
 
 
         public Task DeleteAsync(long position, long count)
         {
-            return Task.Factory.StartNew(() =>
+            return Lock(() =>
             {
                 if (count < 1)
                 {
                     return;
                 }
-                WaitUnlock();
-                IsLoading = true;
                 MoveByte(position + count, - count);
-                IsLoading = false;
             });
         }
         public Task WriteAsync(byte[] buffer, long position, long replaceCount)
         {
-            return Task.Factory.StartNew(() =>
+            return Lock(() =>
             {
-                WaitUnlock();
-                IsLoading = true;
                 var offset = buffer.Length - replaceCount;
                 MoveByte(position + replaceCount, offset);
                 Seek(position);
                 Reader.Write(buffer, 0, buffer.Length);
-                IsLoading = false;
             });
         }
         public Task WriteAsync(Stream source, long position, long replaceCount)
         {
-            return Task.Factory.StartNew(() =>
+            return Lock(() =>
             {
-                WaitUnlock();
-                IsLoading = true;
                 var offset = source.Length - replaceCount;
                 MoveByte(position + replaceCount, offset);
                 Seek(position);
@@ -177,7 +173,6 @@ namespace ZoDream.HexViewer.Storage
                     }
                     Reader.WriteByte((byte)bt);
                 }
-                IsLoading = false;
             });
 
         }
@@ -278,6 +273,29 @@ namespace ZoDream.HexViewer.Storage
             }
         }
 
+
+        private Task<T> Lock<T>(Func<T> func)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                WaitUnlock();
+                IsLoading = true;
+                var res = func();
+                IsLoading = false;
+                return res;
+            });
+        }
+
+        private Task Lock(Action func)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                WaitUnlock();
+                IsLoading = true;
+                func();
+                IsLoading = false;
+            });
+        }
         public void Dispose()
         {
             Reader.Dispose();

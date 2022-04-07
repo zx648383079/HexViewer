@@ -33,6 +33,14 @@ namespace ZoDream.HexViewer.Storage
         /// <param name="count"></param>
         /// <returns></returns>
         public Task<byte[]> ReadAsync(long position, int count);
+
+        /// <summary>
+        /// 判断是否时这些字节
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        public Task<bool> IsAsync(byte[] buffer, long position);
         /// <summary>
         /// 查找指定子节的位置
         /// </summary>
