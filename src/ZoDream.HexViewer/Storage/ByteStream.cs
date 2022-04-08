@@ -26,20 +26,32 @@ namespace ZoDream.HexViewer.Storage
 
         public long Length => Reader.Length;
 
-        public Task<byte[]> ReadAsync(int count)
+        public Task<byte[]> ReadAsync(int count, CancellationToken cancellationToken = default)
         {
             return Lock(() =>
             {
-                return Read(count);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return Array.Empty<byte>();
+                }
+                return ReadByteAsync(count, cancellationToken).GetAwaiter().GetResult();
             });
         }
 
-        public Task<byte[]> ReadAsync(long position, int count)
+        public Task<byte[]> ReadAsync(long position, int count, CancellationToken cancellationToken = default)
         {
             return Lock(() =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return Array.Empty<byte>();
+                }
                 Seek(position);
-                return Read(count);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return Array.Empty<byte>();
+                }
+                return ReadByteAsync(count, cancellationToken).GetAwaiter().GetResult();
             });
         }
 
@@ -52,7 +64,7 @@ namespace ZoDream.HexViewer.Storage
         }
 
 
-        public Task<long> FindAsync(byte[] buffer, long position = 0, bool reverse = false)
+        public Task<long> FindAsync(byte[] buffer, long position = 0, bool reverse = false, CancellationToken cancellationToken = default)
         {
             return Lock(() =>
             {
@@ -69,6 +81,10 @@ namespace ZoDream.HexViewer.Storage
                 {
                     for (i = position - buffer.Length; i >= 0; i--)
                     {
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return -1L;
+                        }
                         if (IsByte(buffer, i))
                         {
                             return i;
@@ -78,6 +94,10 @@ namespace ZoDream.HexViewer.Storage
                 {
                     for (i = position; i < Length; i++)
                     {
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return -1L;
+                        }
                         if (IsByte(buffer, i))
                         {
                             return i;
@@ -241,13 +261,11 @@ namespace ZoDream.HexViewer.Storage
             return Reader.ReadByte();
         }
 
-        private byte[] Read(int count)
+        private async Task<byte[]> ReadByteAsync(int count, CancellationToken cancellationToken = default)
         {
-            IsLoading = true;
             var max = Length - Position;
             if (max <= 0 || count <= 0)
             {
-                IsLoading = false;
                 return Array.Empty<byte>();
             }
             if (count > max)
@@ -255,8 +273,11 @@ namespace ZoDream.HexViewer.Storage
                 count = Convert.ToInt32(max);
             }
             var bytes = new byte[count];
-            Reader.Read(bytes, 0, count);
-            IsLoading = false;
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return bytes;
+            }
+            await Reader.ReadAsync(bytes, 0, count, cancellationToken);
             return bytes;
         }
 
@@ -296,6 +317,8 @@ namespace ZoDream.HexViewer.Storage
                 IsLoading = false;
             });
         }
+
+
         public void Dispose()
         {
             Reader.Dispose();

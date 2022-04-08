@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ZoDream.HexViewer.Storage
@@ -25,14 +26,14 @@ namespace ZoDream.HexViewer.Storage
         /// </summary>
         /// <param name="count"></param>
         /// <returns></returns>
-        public Task<byte[]> ReadAsync(int count);
+        public Task<byte[]> ReadAsync(int count, CancellationToken cancellationToken = default);
         /// <summary>
         /// 从指定位置读取指定长度的子节
         /// </summary>
         /// <param name="position"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public Task<byte[]> ReadAsync(long position, int count);
+        public Task<byte[]> ReadAsync(long position, int count, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// 判断是否时这些字节
@@ -48,7 +49,7 @@ namespace ZoDream.HexViewer.Storage
         /// <param name="position"></param>
         /// <param name="reverse">是否是反向寻找</param>
         /// <returns></returns>
-        public Task<long> FindAsync(byte[] buffer, long position = 0, bool reverse = false);
+        public Task<long> FindAsync(byte[] buffer, long position = 0, bool reverse = false, CancellationToken cancellationToken = default);
         /// <summary>
         /// 复制指定长度的内容到目标文件中
         /// </summary>

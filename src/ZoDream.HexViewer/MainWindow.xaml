@@ -29,16 +29,26 @@
             <ctl:IconButton x:Name="OpenBtn" Icon="&#xE1A5;" Label="打开文件" Click="OpenBtn_Click"/>
             <ctl:IconButton x:Name="EditBtn" Icon="&#xE104;" Label="编辑" Visibility="Collapsed" Click="EditBtn_Click"/>
             <ctl:IconButton x:Name="DeleteBtn" Icon="&#xE107;" Label="删除" Visibility="Collapsed" Click="DeleteBtn_Click"/>
-            <ctl:IconButton x:Name="SaveBtn" Icon="&#xE105;" Label="保存" Visibility="Collapsed"/>
+            <!--<ctl:IconButton x:Name="SaveBtn" Icon="&#xE105;" Label="保存" Visibility="Collapsed"/>-->
             <ctl:IconButton x:Name="SearchBtn" Icon="&#xE11A;" Label="搜索" Visibility="Collapsed" Click="SearchBtn_Click"/>
             <ctl:IconButton x:Name="PreviewBtn" Icon="&#xE7B3;" Label="预览" Visibility="Collapsed" Click="PreviewBtn_Click"/>
             <ctl:IconButton x:Name="PropertyBtn" Icon="&#xE946;" Label="属性" Visibility="Collapsed" Click="PropertyBtn_Click"/>
             <ctl:IconButton x:Name="SettingBtn" Icon="&#xE115;" Label="配置" Click="SettingBtn_Click"/>
-            <ctl:IconButton x:Name="HelpBtn" Icon="&#xE11B;" Label="帮助"/>
+            <ctl:IconButton x:Name="HelpBtn" Icon="&#xE11B;" Label="帮助" Click="HelpBtn_Click"/>
         </StackPanel>
         <ctl:HexEditor x:Name="HexTb" Grid.Row="1" 
                        PreviewDragOver="HexTb_PreviewDragOver" Drop="HexTb_Drop" 
-                       SelectionChanged="HexTb_SelectionChanged"/>
+                       SelectionChanged="HexTb_SelectionChanged">
+            <ctl:HexEditor.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="复制" Click="HexMenu_Click"/>
+                    <MenuItem Header="粘贴" Click="HexMenu_Click"/>
+                    <MenuItem Header="删除" Click="HexMenu_Click"/>
+                    <MenuItem Header="编辑" Click="HexMenu_Click"/>
+                    <MenuItem Header="查看" Click="HexMenu_Click"/>
+                </ContextMenu>
+            </ctl:HexEditor.ContextMenu>
+        </ctl:HexEditor>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>

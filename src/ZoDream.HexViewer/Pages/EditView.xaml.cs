@@ -95,10 +95,10 @@ namespace ZoDream.HexViewer.Pages
             DialogResult = true;
         }
 
-        public void UpdateRange(long positon, int length, string text)
+        public void UpdateRange(long position, int length, string text)
         {
-            StartTb.Value = positon;
-            EndTb.Value = positon + length;
+            StartTb.Value = position;
+            EndTb.Value = position + length;
             ByteTextTb.Text = text;
             TextTb.Text = text;
             for (int i = App.ViewModel.ByteModeItems.Length - 1; i >= 0; i--)

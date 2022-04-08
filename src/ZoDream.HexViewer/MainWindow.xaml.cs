@@ -65,8 +65,8 @@ namespace ZoDream.HexViewer
         private void OpenFile(string file)
         {
             ViewModel.FileName = file;
-            PropertyBtn.Visibility = PreviewBtn.Visibility = SearchBtn.Visibility =
-                    SaveBtn.Visibility = EditBtn.Visibility = string.IsNullOrWhiteSpace(file) ?
+            /*SaveBtn.Visibility = */PropertyBtn.Visibility = PreviewBtn.Visibility = SearchBtn.Visibility =
+                    EditBtn.Visibility = string.IsNullOrWhiteSpace(file) ?
                     Visibility.Collapsed : Visibility.Visible;
             HexTb.Source = ViewModel.Reader;
         }
@@ -152,8 +152,7 @@ namespace ZoDream.HexViewer
             {
                 return;
             }
-            var select = HexTb.SelectionByte;
-            DeleteAsync(ViewModel.Reader, select.Item2, select.Item1.Length);
+            TapDelete();
         }
 
         private void TapCopy()
@@ -179,6 +178,11 @@ namespace ZoDream.HexViewer
             {
                 return;
             }
+            TapSelectEdit(text);
+        }
+
+        private void TapSelectEdit(string text)
+        {
             var page = new EditView();
             var select = HexTb.SelectionByte;
             page.UpdateRange(select.Item2 < 0 ? HexTb.Position : select.Item2, select.Item1.Length, text);
@@ -188,11 +192,20 @@ namespace ZoDream.HexViewer
             }
         }
 
+        private void TapSelectPreview()
+        {
+            var page = new PreviewView();
+            var select = HexTb.SelectionByte;
+            page.UpdateRange(select.Item2 < 0 ? HexTb.Position : select.Item2, select.Item1.Length);
+            page.ShowDialog();
+        }
+
         private async void DeleteAsync(IByteStream stream, long position, int count)
         {
             await stream.DeleteAsync(position, count);
             HexTb.Select();
             HexTb.Refresh(true);
+            MessageBox.Show("删除成功");
         }
 
         private void CommandBinding_Copy(object sender, ExecutedRoutedEventArgs e)
@@ -211,6 +224,46 @@ namespace ZoDream.HexViewer
                 return;
             }
             TapPaste();
+        }
+
+        private void TapDelete()
+        {
+            if (ViewModel.Reader == null)
+            {
+                return;
+            }
+            var select = HexTb.SelectionByte;
+            DeleteAsync(ViewModel.Reader, select.Item2, select.Item1.Length);
+        }
+
+        private void HexMenu_Click(object sender, RoutedEventArgs e)
+        {
+            switch ((sender as MenuItem)!.Header)
+            {
+                case "复制":
+                    TapCopy();
+                    break;
+                case "粘贴":
+                    TapPaste();
+                    break;
+                case "删除":
+                    TapDelete();
+                    break;
+                case "编辑":
+                    TapSelectEdit(string.Empty);
+                    break;
+                case "查看":
+                    TapSelectPreview();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void HelpBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var page = new HelpView();
+            page.Show();
         }
     }
 }

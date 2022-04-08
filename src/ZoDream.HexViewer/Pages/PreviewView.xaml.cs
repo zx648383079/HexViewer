@@ -77,5 +77,12 @@ namespace ZoDream.HexViewer.Pages
             await App.ViewModel.Reader!.CopyToAsync(fs, start, end - start);
             ExportBtn.IsEnabled = true;
         }
+
+        public void UpdateRange(long position, int length)
+        {
+            StartTb.Value = position;
+            EndTb.Value = position + length;
+            ViewBtn_Click(ViewBtn, new RoutedEventArgs());
+        }
     }
 }

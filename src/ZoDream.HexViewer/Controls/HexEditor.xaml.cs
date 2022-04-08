@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -118,6 +119,7 @@ namespace ZoDream.HexViewer.Controls
         private byte[]? OriginalBuffer;
         private Action<Point, bool>? OnMouseMoveEnd;
         public event RoutedPropertyChangedEventHandler<int>? SelectionChanged;
+        private CancellationTokenSource TokenSource = new();
 
         public bool IsSelectionActive { get; private set; } = false;
 
@@ -348,6 +350,7 @@ namespace ZoDream.HexViewer.Controls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            ContextMenu.Visibility = Visibility.Collapsed;
             UpdateByteHeader();
             UpdateTextHeader();
         }
@@ -360,6 +363,7 @@ namespace ZoDream.HexViewer.Controls
             ByteScrollBar.Visibility = pageCount > 1 ? Visibility.Visible : Visibility.Collapsed;
             if (Source == null)
             {
+                ContextMenu.Visibility = Visibility.Collapsed;
                 UpdateByteSource(Array.Empty<byte>());
                 return;
             }
@@ -448,31 +452,51 @@ namespace ZoDream.HexViewer.Controls
             {
                 return;
             }
-            GotoLine((long)(e.NewValue > e.OldValue ? Math.Ceiling(e.NewValue) : Math.Floor(e.NewValue)));
+            TokenSource.Cancel();
+            TokenSource = new CancellationTokenSource();
+            var token = TokenSource.Token;
+            Task.Factory.StartNew(() =>
+            {
+                Thread.Sleep(200);
+                if (token.IsCancellationRequested)
+                {
+                    return;
+                }
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    GotoLine((long)(e.NewValue > e.OldValue ? Math.Ceiling(e.NewValue) : Math.Floor(e.NewValue)), token);
+                });
+            }, token);
+            
         }
 
-        public void GotoPage(double index)
+        public void GotoPage(double index, CancellationToken cancellationToken = default)
         {
-            GotoLine((long)Math.Floor(index * PageLineCount));
+            GotoLine((long)Math.Floor(index * PageLineCount), cancellationToken);
         }
 
-        public void GotoLine(long index)
+        public void GotoLine(long index, CancellationToken cancellationToken = default)
         {
             if (index < 0)
             {
                 index = 0;
             }
-            GotoPosition(index * ByteLength);
+            GotoPosition(index * ByteLength, cancellationToken);
         }
 
-        public async void GotoPosition(long index)
+        public async void GotoPosition(long index, CancellationToken cancellationToken = default)
         {
             if (Source == null)
             {
                 return;
             }
             ByteScrollBar.Value = Math.Floor((double)index / ByteLength);
-            UpdateByteSource(await Source.ReadAsync(index, PageLineCount * ByteLength), index);
+            var buffer = await Source.ReadAsync(index, PageLineCount * ByteLength, cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+            UpdateByteSource(buffer, index);
         }
 
 
@@ -494,6 +518,13 @@ namespace ZoDream.HexViewer.Controls
             if (IsFinish)
             {
                 SelectionChanged?.Invoke(this, new RoutedPropertyChangedEventArgs<int>(0, len));
+                var isMenuVisible = Source == null || len < 1;
+                if (isMenuVisible)
+                {
+                    ContextMenu.StaysOpen = false;
+                }
+                ContextMenu.Visibility = isMenuVisible ? Visibility.Collapsed : Visibility.Visible;
+                
             }
         }
 

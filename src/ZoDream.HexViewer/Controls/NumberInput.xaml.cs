@@ -81,7 +81,7 @@ namespace ZoDream.HexViewer.Controls
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var tb = d as NumberInput;
-            tb.ValueTb.Text = e.NewValue.ToString();
+            tb!.ValueTb.Text = e.NewValue.ToString();
         }
 
         private void MinusBtn_Click(object sender, RoutedEventArgs e)
@@ -117,10 +117,14 @@ namespace ZoDream.HexViewer.Controls
             Task.Factory.StartNew(() =>
             {
                 Thread.Sleep(2000);
+                if (TokenSource.IsCancellationRequested)
+                {
+                    return;
+                }
                 App.Current.Dispatcher.Invoke(() =>
                 {
                     var oldVal = Value;
-                    var val = Convert.ToInt64((sender as TextBox).Text);
+                    var val = Convert.ToInt64((sender as TextBox)!.Text);
                     if (val < Min)
                     {
                         val = Min;
