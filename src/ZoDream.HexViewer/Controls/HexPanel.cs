@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -20,13 +21,54 @@ using ZoDream.HexViewer.Utils;
 namespace ZoDream.HexViewer.Controls
 {
     /// <summary>
-    /// HexEditor.xaml 的交互逻辑
+    /// 按照步骤 1a 或 1b 操作，然后执行步骤 2 以在 XAML 文件中使用此自定义控件。
+    ///
+    /// 步骤 1a) 在当前项目中存在的 XAML 文件中使用该自定义控件。
+    /// 将此 XmlNamespace 特性添加到要使用该特性的标记文件的根
+    /// 元素中:
+    ///
+    ///     xmlns:MyNamespace="clr-namespace:ZoDream.HexViewer.Controls"
+    ///
+    ///
+    /// 步骤 1b) 在其他项目中存在的 XAML 文件中使用该自定义控件。
+    /// 将此 XmlNamespace 特性添加到要使用该特性的标记文件的根
+    /// 元素中:
+    ///
+    ///     xmlns:MyNamespace="clr-namespace:ZoDream.HexViewer.Controls;assembly=ZoDream.HexViewer.Controls"
+    ///
+    /// 您还需要添加一个从 XAML 文件所在的项目到此项目的项目引用，
+    /// 并重新生成以避免编译错误:
+    ///
+    ///     在解决方案资源管理器中右击目标项目，然后依次单击
+    ///     “添加引用”->“项目”->[浏览查找并选择此项目]
+    ///
+    ///
+    /// 步骤 2)
+    /// 继续操作并在 XAML 文件中使用控件。
+    ///
+    ///     <MyNamespace:HexPanel/>
+    ///
     /// </summary>
-    public partial class HexEditor : UserControl
+    [TemplatePart(Name = ByteModeTbName, Type =typeof(TextBlock))]
+    [TemplatePart(Name = TextHeaderTbName, Type =typeof(TextBlock))]
+    [TemplatePart(Name = ByteHeaderPanelName, Type =typeof(StackPanel))]
+    [TemplatePart(Name = LinePanelName, Type =typeof(StackPanel))]
+    [TemplatePart(Name = BytePanelName, Type =typeof(StackPanel))]
+    [TemplatePart(Name = TextPanelName, Type =typeof(StackPanel))]
+    [TemplatePart(Name = ByteScrollBarName, Type =typeof(ScrollBar))]
+    public class HexPanel : Control
     {
-        public HexEditor()
+        const string ByteModeTbName = "PART_ByteModeTb";
+        const string ByteHeaderPanelName = "PART_ByteHeaderPanel";
+        const string TextHeaderTbName = "PART_TextHeaderTb";
+        const string LinePanelName = "PART_LinePanel";
+        const string BytePanelName = "PART_BytePanel";
+        const string TextPanelName = "PART_TextPanel";
+        const string ByteScrollBarName = "PART_ByteScrollBar";
+
+        static HexPanel()
         {
-            InitializeComponent();
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(HexPanel), new FrameworkPropertyMetadata(typeof(HexPanel)));
         }
 
 
@@ -38,9 +80,9 @@ namespace ZoDream.HexViewer.Controls
 
         // Using a DependencyProperty as the backing store for LineMode.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty LineModeProperty =
-            DependencyProperty.Register("LineMode", typeof(ByteBaseMode), typeof(HexEditor), new PropertyMetadata(ByteBaseMode.Hex, (d, e) =>
+            DependencyProperty.Register("LineMode", typeof(ByteBaseMode), typeof(HexPanel), new PropertyMetadata(ByteBaseMode.Hex, (d, e) =>
             {
-                (d as HexEditor)?.UpdateLineMode();
+                (d as HexPanel)?.UpdateLineMode();
             }));
 
         public int ByteLength
@@ -51,9 +93,9 @@ namespace ZoDream.HexViewer.Controls
 
         // Using a DependencyProperty as the backing store for ByteLength.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ByteLengthProperty =
-            DependencyProperty.Register("ByteLength", typeof(int), typeof(HexEditor), new PropertyMetadata(16, (d, e) =>
+            DependencyProperty.Register("ByteLength", typeof(int), typeof(HexPanel), new PropertyMetadata(16, (d, e) =>
             {
-                (d as HexEditor)?.UpdateByteLength();
+                (d as HexPanel)?.UpdateByteLength();
             }));
 
 
@@ -65,9 +107,9 @@ namespace ZoDream.HexViewer.Controls
 
         // Using a DependencyProperty as the backing store for ByteMode.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ByteModeProperty =
-            DependencyProperty.Register("ByteMode", typeof(ByteBaseMode), typeof(HexEditor), new PropertyMetadata(ByteBaseMode.Hex, (d, e) =>
+            DependencyProperty.Register("ByteMode", typeof(ByteBaseMode), typeof(HexPanel), new PropertyMetadata(ByteBaseMode.Hex, (d, e) =>
             {
-                (d as HexEditor)?.UpdateByteMode();
+                (d as HexPanel)?.UpdateByteMode();
             }));
 
 
@@ -79,9 +121,9 @@ namespace ZoDream.HexViewer.Controls
 
         // Using a DependencyProperty as the backing store for TextEncoding.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TextEncodingProperty =
-            DependencyProperty.Register("TextEncoding", typeof(Encoding), typeof(HexEditor), new PropertyMetadata(Encoding.ASCII, (d, e) =>
+            DependencyProperty.Register("TextEncoding", typeof(Encoding), typeof(HexPanel), new PropertyMetadata(Encoding.ASCII, (d, e) =>
             {
-                (d as HexEditor)?.UpdateEncoding();
+                (d as HexPanel)?.UpdateEncoding();
             }));
 
         public IByteStream? Source
@@ -92,13 +134,13 @@ namespace ZoDream.HexViewer.Controls
 
         // Using a DependencyProperty as the backing store for Source.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register("Source", typeof(IByteStream), typeof(HexEditor), new PropertyMetadata(null, (d, e) =>
+            DependencyProperty.Register("Source", typeof(IByteStream), typeof(HexPanel), new PropertyMetadata(null, (d, e) =>
             {
                 if (LocalizedLangExtension.IsDesignMode)
                 {
                     return;
                 }
-                (d as HexEditor)?.UpdateSource();
+                (d as HexPanel)?.UpdateSource();
             }));
 
         public long Position
@@ -109,16 +151,23 @@ namespace ZoDream.HexViewer.Controls
 
         // Using a DependencyProperty as the backing store for Position.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PositionProperty =
-            DependencyProperty.Register("Position", typeof(long), typeof(HexEditor), new PropertyMetadata(0L, (d, e) =>
+            DependencyProperty.Register("Position", typeof(long), typeof(HexPanel), new PropertyMetadata(0L, (d, e) =>
             {
-                (d as HexEditor)?.GotoPosition((long)e.NewValue);
+                (d as HexPanel)?.GotoPosition((long)e.NewValue);
             }));
 
 
-
+        private TextBlock? ByteModeTb;
+        private TextBlock? TextHeaderTb;
+        private StackPanel? ByteHeaderPanel;
+        private StackPanel? LinePanel;
+        private StackPanel? BytePanel;
+        private StackPanel? TextPanel;
+        private ScrollBar? ByteScrollBar;
         private byte[]? OriginalBuffer;
         private Action<Point, bool>? OnMouseMoveEnd;
         public event RoutedPropertyChangedEventHandler<int>? SelectionChanged;
+        public event RoutedPropertyChangedEventHandler<string>? DropChanged;
         private CancellationTokenSource TokenSource = new();
 
         public bool IsSelectionActive { get; private set; } = false;
@@ -177,7 +226,7 @@ namespace ZoDream.HexViewer.Controls
         {
             get
             {
-                return Math.Max((int)Math.Floor(BytePanel.ActualHeight / ByteHeight), 1);
+                return Math.Max((int)Math.Floor(BytePanel!.ActualHeight / ByteHeight), 1);
             }
         }
 
@@ -189,9 +238,56 @@ namespace ZoDream.HexViewer.Controls
             }
         }
 
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            ByteModeTb = GetTemplateChild(ByteModeTbName) as TextBlock;
+            TextHeaderTb = GetTemplateChild(TextHeaderTbName) as TextBlock;
+            ByteHeaderPanel = GetTemplateChild(ByteHeaderPanelName) as StackPanel;
+            LinePanel = GetTemplateChild(LinePanelName) as StackPanel;
+            BytePanel = GetTemplateChild(BytePanelName) as StackPanel;
+            TextPanel = GetTemplateChild(TextPanelName) as StackPanel;
+            ByteScrollBar = GetTemplateChild(ByteScrollBarName) as ScrollBar;
+
+            if (ByteScrollBar != null)
+            {
+                ByteScrollBar.ValueChanged += ByteScrollBar_ValueChanged;
+            }
+            if (ByteModeTb != null)
+            {
+                ByteModeTb.MouseDown += ByteModeTb_MouseDown;
+            }
+            if (TextHeaderTb != null)
+            {
+                TextHeaderTb.MouseDown += TextHeaderTb_MouseDown;
+            }
+            if (LinePanel != null)
+            {
+                LinePanel.MouseWheel += BytePanel_MouseWheel;
+            }
+            if (BytePanel != null)
+            {
+                BytePanel.MouseWheel += BytePanel_MouseWheel;
+                BytePanel.MouseDown += BytePanel_MouseDown;
+                BytePanel.MouseMove += BytePanel_MouseMove;
+                BytePanel.MouseUp += BytePanel_MouseUp;
+            }
+            if (TextPanel != null)
+            {
+                TextPanel.MouseWheel += BytePanel_MouseWheel;
+            }
+            ContextMenu.Visibility = Visibility.Collapsed;
+            UpdateByteHeader();
+            UpdateTextHeader();
+        }
+
 
         public void Refresh(bool sizeChanged = false)
         {
+            if (ByteScrollBar is null)
+            {
+                return;
+            }
             if (sizeChanged)
             {
                 var pageCount = PageCount;
@@ -205,7 +301,7 @@ namespace ZoDream.HexViewer.Controls
         private void UpdateBytes(IList<byte> items, int lineCount)
         {
             var format = App.ViewModel.Get(ByteMode);
-            ForEachChildren(BytePanel, lineCount, (panel, i) =>
+            ForEachChildren(BytePanel!, lineCount, (panel, i) =>
             {
                 panel.Height = ByteHeight;
                 var start = i * ByteLength;
@@ -236,7 +332,7 @@ namespace ZoDream.HexViewer.Controls
         private void UpdateLine(long start, int lineCount)
         {
             var format = App.ViewModel.Get(LineMode);
-            ForEachChildren(LinePanel, lineCount, (tb, i) =>
+            ForEachChildren(LinePanel!, lineCount, (tb, i) =>
             {
                 tb.Height = ByteHeight;
                 tb.FontSize = FontSize;
@@ -253,7 +349,7 @@ namespace ZoDream.HexViewer.Controls
 
         private void UpdateText(IList<byte> items, int lineCount)
         {
-            ForEachChildren(TextPanel, lineCount, (tb, i) =>
+            ForEachChildren(TextPanel!, lineCount, (tb, i) =>
             {
                 tb.Height = ByteHeight;
                 tb.FontSize = FontSize;
@@ -275,14 +371,14 @@ namespace ZoDream.HexViewer.Controls
 
         private void UpdateTextHeader()
         {
-            TextHeaderTb.Text = $"文本({TextEncoding.EncodingName})";
+            TextHeaderTb!.Text = $"文本({TextEncoding.EncodingName})";
         }
 
         private void UpdateByteHeader()
         {
-            ByteModeTb.Text = App.ViewModel.Get(ByteMode).Name;
+            ByteModeTb!.Text = App.ViewModel.Get(ByteMode).Name;
             var byteFormat = 16;
-            ForEachChildren(ByteHeaderPanel, ByteLength, (tb, i) =>
+            ForEachChildren(ByteHeaderPanel!, ByteLength, (tb, i) =>
             {
                 tb.Width = ByteWidth;
                 tb.FontSize = FontSize;
@@ -297,7 +393,7 @@ namespace ZoDream.HexViewer.Controls
             }, true);
         }
 
-        private void ForEachChildren<T>(Panel panel, int count, Action<T, int> updateFn, Func<int, T> addFn, bool overRemove = false) 
+        private void ForEachChildren<T>(Panel panel, int count, Action<T, int> updateFn, Func<int, T> addFn, bool overRemove = false)
             where T : UIElement
         {
             if (overRemove)
@@ -335,7 +431,7 @@ namespace ZoDream.HexViewer.Controls
         private void ForEachByte(Action<ByteLabel, int> func)
         {
             var i = 0;
-            foreach (StackPanel item in BytePanel.Children)
+            foreach (StackPanel item in BytePanel!.Children)
             {
                 foreach (ByteLabel it in item.Children)
                 {
@@ -348,17 +444,10 @@ namespace ZoDream.HexViewer.Controls
             }
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            ContextMenu.Visibility = Visibility.Collapsed;
-            UpdateByteHeader();
-            UpdateTextHeader();
-        }
-
         private void UpdateSource()
         {
             var pageCount = PageCount;
-            ByteScrollBar.Maximum = LineCount;
+            ByteScrollBar!.Maximum = LineCount;
             ByteScrollBar.Value = 0;
             ByteScrollBar.Visibility = pageCount > 1 ? Visibility.Visible : Visibility.Collapsed;
             if (Source == null)
@@ -432,10 +521,12 @@ namespace ZoDream.HexViewer.Controls
             if (TextEncoding == Encoding.ASCII)
             {
                 TextEncoding = Encoding.UTF8;
-            } else if (TextEncoding == Encoding.UTF8)
+            }
+            else if (TextEncoding == Encoding.UTF8)
             {
                 TextEncoding = Encoding.Unicode;
-            } else
+            }
+            else
             {
                 TextEncoding = Encoding.ASCII;
             }
@@ -467,7 +558,7 @@ namespace ZoDream.HexViewer.Controls
                     GotoLine((long)(e.NewValue > e.OldValue ? Math.Ceiling(e.NewValue) : Math.Floor(e.NewValue)), token);
                 });
             }, token);
-            
+
         }
 
         public void GotoPage(double index, CancellationToken cancellationToken = default)
@@ -490,7 +581,7 @@ namespace ZoDream.HexViewer.Controls
             {
                 return;
             }
-            ByteScrollBar.Value = Math.Floor((double)index / ByteLength);
+            ByteScrollBar!.Value = Math.Floor((double)index / ByteLength);
             var buffer = await Source.ReadAsync(index, PageLineCount * ByteLength, cancellationToken);
             if (cancellationToken.IsCancellationRequested)
             {
@@ -524,7 +615,7 @@ namespace ZoDream.HexViewer.Controls
                     ContextMenu.StaysOpen = false;
                 }
                 ContextMenu.Visibility = isMenuVisible ? Visibility.Collapsed : Visibility.Visible;
-                
+
             }
         }
 
@@ -543,7 +634,8 @@ namespace ZoDream.HexViewer.Controls
             {
                 var b = Position + bY * ByteLength + bX;
                 Select(Convert.ToInt64(b), Convert.ToInt32(Position + eY * ByteLength + eX + 1 - b), IsFinish);
-            } else
+            }
+            else
             {
                 var e = Position + eY * ByteLength + eX;
                 Select(Convert.ToInt64(e), Convert.ToInt32(Position + bY * ByteLength + bX + 1 - e), IsFinish);
@@ -552,7 +644,7 @@ namespace ZoDream.HexViewer.Controls
 
         private void BytePanel_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            ByteScrollBar_ValueChanged(ByteScrollBar, new RoutedPropertyChangedEventArgs<double>(ByteScrollBar.Value, ByteScrollBar.Value - (e.Delta / 120)));
+            ByteScrollBar_ValueChanged(ByteScrollBar!, new RoutedPropertyChangedEventArgs<double>(ByteScrollBar!.Value, ByteScrollBar.Value - (e.Delta / 120)));
         }
 
         private void ByteModeTb_MouseDown(object sender, MouseButtonEventArgs e)
@@ -565,8 +657,9 @@ namespace ZoDream.HexViewer.Controls
             ToggleTextEncoding();
         }
 
-        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
+            base.OnRenderSizeChanged(sizeInfo);
             Refresh();
         }
 

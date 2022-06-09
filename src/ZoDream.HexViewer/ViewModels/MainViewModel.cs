@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ZoDream.HexViewer.Models;
 using ZoDream.HexViewer.Storage;
+using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.HexViewer.ViewModels
 {

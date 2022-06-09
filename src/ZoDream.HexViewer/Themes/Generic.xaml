@@ -5,7 +5,8 @@
 
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Themes/IconButton.xaml"/>
-        <ResourceDictionary Source="/Themes/ByteLabel.xaml"/>
+        <ResourceDictionary Source="/Themes/HexPanel.xaml"/>
     </ResourceDictionary.MergedDictionaries>
+
+
 </ResourceDictionary>

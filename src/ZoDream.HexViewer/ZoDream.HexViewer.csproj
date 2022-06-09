@@ -5,7 +5,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-	  <LangVersion>9.0</LangVersion>
+	  <LangVersion>10</LangVersion>
 	  <Version>1.0</Version>
     <Authors>zodream</Authors>
     <Company>zodream.cn</Company>
@@ -16,6 +16,11 @@
 
   <ItemGroup>
     <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\shared\ZoDream.Shared.Controls\ZoDream.Shared.Controls.csproj" />
+    <ProjectReference Include="..\..\shared\ZoDream.Shared\ZoDream.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

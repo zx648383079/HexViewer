@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ctl="clr-namespace:ZoDream.HexViewer.Controls"
+        xmlns:ctl="clr-namespace:ZoDream.Shared.Controls;assembly=ZoDream.Shared.Controls"
         xmlns:local="clr-namespace:ZoDream.HexViewer.Pages"
         mc:Ignorable="d"
         Title="预览" 

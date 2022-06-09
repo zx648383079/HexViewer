@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ZoDream.HexViewer.Models;
 using ZoDream.HexViewer.Storage;
+using ZoDream.Shared.Storage;
+using ZoDream.Shared.ViewModels;
 
 namespace ZoDream.HexViewer.ViewModels
 {
@@ -100,7 +102,7 @@ namespace ZoDream.HexViewer.ViewModels
                 return;
             }
             TypeMessage = "Loading ...";
-            using var sr = Utils.Storage.File.Reader(signFile);
+            using var sr = LocationStorage.Reader(signFile);
             while (true)
             {
                 var line = await sr.ReadLineAsync();
