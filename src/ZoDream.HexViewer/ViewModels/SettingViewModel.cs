@@ -68,6 +68,12 @@ namespace ZoDream.HexViewer.ViewModels
             set => Set(ref textEncoding, value);
         }
 
+        private bool textLineEncode;
+
+        public bool TextLineEncode {
+            get => textLineEncode;
+            set => Set(ref textLineEncode, value);
+        }
 
 
     }

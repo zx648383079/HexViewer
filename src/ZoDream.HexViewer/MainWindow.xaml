@@ -38,6 +38,7 @@
             <sctl:IconButton x:Name="HelpBtn" Icon="&#xE11B;" Label="帮助" Click="HelpBtn_Click"/>
         </StackPanel>
         <ctl:HexPanel x:Name="HexTb" Grid.Row="1" 
+                      AllowDrop="True"
                        DragOver="HexTb_PreviewDragOver" Drop="HexTb_Drop"
                        SelectionChanged="HexTb_SelectionChanged">
             <ctl:HexPanel.ContextMenu>

@@ -98,7 +98,8 @@ namespace ZoDream.HexViewer
                 ByteLength = HexTb.ByteLength,
                 LineMode = ViewModel.Get(HexTb.LineMode),
                 ByteMode = ViewModel.Get(HexTb.ByteMode),
-                TextEncoding = HexTb.TextEncoding.EncodingName
+                TextEncoding = HexTb.TextEncoding.EncodingName,
+                TextLineEncode = HexTb.TextLineEncode,
             };
             var page = new SettingView(model);
             page.Show();
@@ -121,6 +122,9 @@ namespace ZoDream.HexViewer
                         break;
                     case "TextEncoding":
                         HexTb.TextEncoding = Encoding.GetEncoding(model.TextEncoding);
+                        break;
+                    case nameof(model.TextLineEncode):
+                        HexTb.TextLineEncode = model.TextLineEncode;
                         break;
                     default:
                         break;

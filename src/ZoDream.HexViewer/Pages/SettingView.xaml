@@ -23,6 +23,9 @@
             <Style TargetType="ScrollViewer">
                 <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
             </Style>
+            <Style TargetType="ctl:NumberInput">
+                <Setter Property="MinWidth" Value="80"/>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -48,6 +51,8 @@
                             <ComboBox x:Name="ByteTb"  ItemsSource="{Binding ByteModeItems}" SelectedItem="{Binding ByteMode, Mode=TwoWay}" DisplayMemberPath="Name"/>
                             <TextBlock Text="文本编码" Style="{StaticResource HeaderTb}"/>
                             <ComboBox x:Name="EncodingTb" IsEditable="True" ItemsSource="{Binding EncodingItems}" Text="{Binding TextEncoding, Mode=TwoWay}"/>
+                            <TextBlock Text="文本格式化换行" Style="{StaticResource HeaderTb}"/>
+                            <ctl:SwitchInput Value="{Binding TextLineEncode, Mode=TwoWay}"/>
                         </StackPanel>
                     </GroupBox>
                 </ScrollViewer>

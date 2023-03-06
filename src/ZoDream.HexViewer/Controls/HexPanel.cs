@@ -126,6 +126,22 @@ namespace ZoDream.HexViewer.Controls
                 (d as HexPanel)?.UpdateEncoding();
             }));
 
+
+
+        public bool TextLineEncode {
+            get { return (bool)GetValue(TextLineEncodeProperty); }
+            set { SetValue(TextLineEncodeProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for TextLineEncode.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TextLineEncodeProperty =
+            DependencyProperty.Register("TextLineEncode", typeof(bool), typeof(HexPanel), 
+                new PropertyMetadata(false, (d, e) => {
+                    (d as HexPanel)?.UpdateEncoding();
+                }));
+
+
+
         public IByteStream? Source
         {
             get { return (IByteStream)GetValue(SourceProperty); }
@@ -359,7 +375,8 @@ namespace ZoDream.HexViewer.Controls
                 {
                     bytes[j] = items[start + j];
                 }
-                tb.Content = TextEncoding.GetString(bytes);
+                var str = TextEncoding.GetString(bytes);
+                tb.Content = TextLineEncode ? str.Replace("\r", "\\r").Replace("\n", "\\n") : str;
             }, i =>
             {
                 return new ByteLabel()
