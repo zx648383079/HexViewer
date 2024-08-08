@@ -329,6 +329,7 @@ namespace ZoDream.HexViewer.Controls
                     tb.OriginalByte = items[itemIndex];
                     tb.OriginalPosition = Position + itemIndex;
                     tb.Content = format.Format(items[itemIndex], false, true);
+                    tb.ToolTip = FormatByteText(items[itemIndex]);
                 }, i =>
                 {
                     return new ByteLabel()
@@ -343,6 +344,19 @@ namespace ZoDream.HexViewer.Controls
                     Orientation = Orientation.Horizontal,
                 };
             });
+        }
+
+        private string FormatByteText(byte code)
+        {
+            return code switch
+            {
+                0x09 => "\\t",
+                0x0A => "\\n",
+                0x0D => "\\r",
+                0x20 => "<space>",
+                >=0x21 and <= 0x7e => Convert.ToChar(code).ToString(),
+                _ => string.Empty
+            };
         }
 
         private void UpdateLine(long start, int lineCount)
@@ -470,7 +484,7 @@ namespace ZoDream.HexViewer.Controls
             if (Source == null)
             {
                 ContextMenu.Visibility = Visibility.Collapsed;
-                UpdateByteSource(Array.Empty<byte>());
+                UpdateByteSource([]);
                 return;
             }
             GotoPosition(0);

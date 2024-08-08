@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ZoDream.HexViewer.Models;
 using ZoDream.HexViewer.Storage;
-using ZoDream.Shared.ViewModels;
+using ZoDream.Shared.ViewModel;
 
 namespace ZoDream.HexViewer.ViewModels
 {
@@ -15,12 +15,12 @@ namespace ZoDream.HexViewer.ViewModels
         public MainViewModel()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            ByteModeItems = new ByteModeItem[] {
+            ByteModeItems = [
                 new ByteModeItem(ByteBaseMode.Decimal, "十进制") { Length = 3, StringFormat = 10},
                 new ByteModeItem(ByteBaseMode.Binary, "二进制") {Prefix = "0b", Length = 8, StringFormat = 2},
                 new ByteModeItem(ByteBaseMode.Octal, "八进制") {Prefix = "0", Length = 3, StringFormat = 8},
                 new ByteModeItem(ByteBaseMode.Hex, "十六进制") {Prefix = "0x", Length = 2, StringFormat = 16},
-            };
+            ];
         }
 
         public ByteModeItem[] ByteModeItems { get; private set; }

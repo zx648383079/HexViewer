@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ZoDream.HexViewer.ViewModels;
-using ZoDream.Shared.ViewModels;
+using ZoDream.Shared.ViewModel;
 
 namespace ZoDream.HexViewer.Storage
 {
@@ -16,16 +12,16 @@ namespace ZoDream.HexViewer.Storage
         public ByteStream(string fileName)
         {
             FileName = fileName;
-            Reader = new FileStream(fileName, FileMode.Open, FileAccess.ReadWrite);
+            BaseStream = new FileStream(fileName, FileMode.Open, FileAccess.ReadWrite);
         }
 
         private string FileName;
-        private FileStream Reader;
+        public FileStream BaseStream { get; private set; }
         private volatile bool IsLoading = false;
 
-        public long Position => Reader.Position;
+        public long Position => BaseStream.Position;
 
-        public long Length => Reader.Length;
+        public long Length => BaseStream.Length;
 
         public Task<byte[]> ReadAsync(int count, CancellationToken cancellationToken = default)
         {
@@ -33,7 +29,7 @@ namespace ZoDream.HexViewer.Storage
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    return Array.Empty<byte>();
+                    return [];
                 }
                 return ReadByteAsync(count, cancellationToken).GetAwaiter().GetResult();
             });
@@ -45,12 +41,12 @@ namespace ZoDream.HexViewer.Storage
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    return Array.Empty<byte>();
+                    return [];
                 }
                 Seek(position);
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    return Array.Empty<byte>();
+                    return [];
                 }
                 return ReadByteAsync(count, cancellationToken).GetAwaiter().GetResult();
             });
@@ -144,7 +140,7 @@ namespace ZoDream.HexViewer.Storage
                 Seek(position);
                 while (count > 0)
                 {
-                    var bt = Reader.ReadByte();
+                    var bt = BaseStream.ReadByte();
                     if (bt < 0)
                     {
                         break;
@@ -174,7 +170,7 @@ namespace ZoDream.HexViewer.Storage
                 var offset = buffer.Length - replaceCount;
                 MoveByte(position + replaceCount, offset);
                 Seek(position);
-                Reader.Write(buffer, 0, buffer.Length);
+                BaseStream.Write(buffer, 0, buffer.Length);
             });
         }
         public Task WriteAsync(Stream source, long position, long replaceCount)
@@ -192,7 +188,7 @@ namespace ZoDream.HexViewer.Storage
                     {
                         break;
                     }
-                    Reader.WriteByte((byte)bt);
+                    BaseStream.WriteByte((byte)bt);
                 }
             });
 
@@ -212,7 +208,7 @@ namespace ZoDream.HexViewer.Storage
             var end = Length - 1;
             if (offset > 0)
             {
-                Reader.SetLength(Length + offset);
+                BaseStream.SetLength(Length + offset);
             }
             long start;
             var max = 4048;
@@ -225,11 +221,11 @@ namespace ZoDream.HexViewer.Storage
                 {
                     bufferLen = (int)Math.Min(max, end - start + 1);
                     Seek(start);
-                    Reader.Read(buffer, 0, bufferLen);
+                    BaseStream.Read(buffer, 0, bufferLen);
                     Seek(start + offset);
                     for (int i = 0; i < bufferLen; i++)
                     {
-                        Reader.WriteByte(buffer[i]);
+                        BaseStream.WriteByte(buffer[i]);
                     }
                     start += bufferLen;
                 }
@@ -241,25 +237,25 @@ namespace ZoDream.HexViewer.Storage
                     bufferLen = (int)Math.Min(max, end - start + 1);
                     Seek(start);
                     Seek(start);
-                    Reader.Read(buffer, 0, bufferLen);
+                    BaseStream.Read(buffer, 0, bufferLen);
                     Seek(start + offset);
                     for (int i = 0; i < bufferLen; i++)
                     {
-                        Reader.WriteByte(buffer[i]);
+                        BaseStream.WriteByte(buffer[i]);
                     }
                     start += bufferLen;
                 }
             }
             if (offset < 0)
             {
-                Reader.SetLength(Length + offset);
+                BaseStream.SetLength(Length + offset);
             }
         }
 
         private int ReadByte(long position)
         {
             Seek(position);
-            return Reader.ReadByte();
+            return BaseStream.ReadByte();
         }
 
         private async Task<byte[]> ReadByteAsync(int count, CancellationToken cancellationToken = default)
@@ -267,7 +263,7 @@ namespace ZoDream.HexViewer.Storage
             var max = Length - Position;
             if (max <= 0 || count <= 0)
             {
-                return Array.Empty<byte>();
+                return [];
             }
             if (count > max)
             {
@@ -278,13 +274,13 @@ namespace ZoDream.HexViewer.Storage
             {
                 return bytes;
             }
-            await Reader.ReadAsync(bytes, 0, count, cancellationToken);
+            await BaseStream.ReadAsync(bytes, 0, count, cancellationToken);
             return bytes;
         }
 
         private void Seek(long position)
         {
-            Reader.Seek(position, SeekOrigin.Begin);
+            BaseStream.Seek(position, SeekOrigin.Begin);
         }
 
         private void WaitUnlock()
@@ -322,7 +318,7 @@ namespace ZoDream.HexViewer.Storage
 
         public void Dispose()
         {
-            Reader.Dispose();
+            BaseStream.Dispose();
         }
     }
 }

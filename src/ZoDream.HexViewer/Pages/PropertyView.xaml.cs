@@ -23,9 +23,8 @@ namespace ZoDream.HexViewer.Pages
         public PropertyView()
         {
             InitializeComponent();
-            DataContext = ViewModel;
         }
 
-        public PropertyViewModel ViewModel = new();
+        public PropertyViewModel ViewModel => (PropertyViewModel)DataContext;
     }
 }

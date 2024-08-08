@@ -1,19 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using ZoDream.HexViewer.Models;
 using ZoDream.HexViewer.Storage;
 using ZoDream.Shared.Storage;
-using ZoDream.Shared.ViewModels;
+using ZoDream.Shared.ViewModel;
 
 namespace ZoDream.HexViewer.ViewModels
 {
-    public class PropertyViewModel: BindableBase
+    public partial class PropertyViewModel: BindableBase
     {
+        public PropertyViewModel()
+        {
+            Md5Command = new RelayCommand(TapMd5);
+            CrcCommand = new RelayCommand(TapCrc);
+            ShaCommand = new RelayCommand(TapSha);
+
+            if (string.IsNullOrWhiteSpace(App.ViewModel.FileName) || App.ViewModel.Reader == null)
+            {
+                return;
+            }
+            FileName = App.ViewModel.FileName;
+            var fileInfo = new FileInfo(FileName);
+            Name = fileInfo.Name;
+            Length = App.ViewModel.Reader.Length;
+            CreatedAt = fileInfo.CreationTime;
+            UpdatedAt = fileInfo.LastWriteTime;
+            _ = LoadSignatureAsync(App.ViewModel.Reader);
+        }
 
         private string name = string.Empty;
 
@@ -74,20 +89,7 @@ namespace ZoDream.HexViewer.ViewModels
 
 
 
-        public PropertyViewModel()
-        {
-            if (string.IsNullOrWhiteSpace(App.ViewModel.FileName) || App.ViewModel.Reader == null)
-            {
-                return;
-            }
-            FileName = App.ViewModel.FileName;
-            var fileInfo = new FileInfo(FileName); 
-            Name = fileInfo.Name;
-            Length = App.ViewModel.Reader.Length;
-            CreatedAt = fileInfo.CreationTime;
-            UpdatedAt = fileInfo.LastWriteTime;
-            _ = LoadSignatureAsync(App.ViewModel.Reader);
-        }
+
 
         public async Task LoadSignatureAsync(IByteStream stream)
         {
