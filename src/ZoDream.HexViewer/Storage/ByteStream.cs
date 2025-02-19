@@ -12,10 +12,10 @@ namespace ZoDream.HexViewer.Storage
         public ByteStream(string fileName)
         {
             FileName = fileName;
-            BaseStream = new FileStream(fileName, FileMode.Open, FileAccess.ReadWrite);
+            BaseStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
         }
 
-        private string FileName;
+        private readonly string FileName;
         public FileStream BaseStream { get; private set; }
         private volatile bool IsLoading = false;
 
@@ -160,6 +160,7 @@ namespace ZoDream.HexViewer.Storage
                 {
                     return;
                 }
+                OpenWritable();
                 MoveByte(position + count, - count);
             });
         }
@@ -168,6 +169,7 @@ namespace ZoDream.HexViewer.Storage
             return Lock(() =>
             {
                 var offset = buffer.Length - replaceCount;
+                OpenWritable();
                 MoveByte(position + replaceCount, offset);
                 Seek(position);
                 BaseStream.Write(buffer, 0, buffer.Length);
@@ -178,6 +180,7 @@ namespace ZoDream.HexViewer.Storage
             return Lock(() =>
             {
                 var offset = source.Length - replaceCount;
+                OpenWritable();
                 MoveByte(position + replaceCount, offset);
                 Seek(position);
                 source.Seek(0, SeekOrigin.Begin);
@@ -192,6 +195,18 @@ namespace ZoDream.HexViewer.Storage
                 }
             });
 
+        }
+
+        private void OpenWritable()
+        {
+            if (BaseStream.CanWrite)
+            {
+                return;
+            }
+            var pos = BaseStream.Position;
+            BaseStream.Close();
+            BaseStream = new FileStream(FileName, FileMode.Open, FileAccess.ReadWrite);
+            BaseStream.Seek(pos, SeekOrigin.Begin);
         }
 
         /// <summary>

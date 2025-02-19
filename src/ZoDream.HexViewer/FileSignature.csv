@@ -182,6 +182,8 @@ jpg; jpe; jpeg,FF D8 FF FE 00,,JPG Graphic File
 KGB,4B 47 42 5F 61 72 63 68 20 2D,,KGB archive
 KOZ,49 44 33 03 00 00 00,,Sprint Music Store audio file (for mobile devices)
 krc,6b 72 63 31 38,,Kugou Lyrics File
+ktx,AB 4B 54 58,,KTX image texture
+ktx2,AB 4B 54 58 20 32 30,,KTX image texture
 LDB,42 49 4C
 lha,2D 6C 68 35 2D,,LHA Compressed
 lha; lzh,[2] 2D 6C 68,,Compressed archive file
@@ -267,6 +269,7 @@ pf,11 00 00 00 53 43 43 41,,Windows prefetch file
 pic,01 00 00 00 01,,Unknown type picture file
 PJT,00 00 07
 PLL,24 53 6F
+pkg,08 00 00 00 50 4B 47 56,,Wallpaper Engine
 PNG,89 50 4E
 PNG,89 50 4E 47
 png,89 50 4E 47 0D 0A,,PNG Image File
